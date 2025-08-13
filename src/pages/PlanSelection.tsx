@@ -126,6 +126,8 @@ export default function PlanSelection() {
 
   const handlePlanSelect = async (planId: string, billingCycle: 'monthly' | 'yearly' | 'semestral') => {
     try {
+      console.log('Starting plan selection:', { planId, billingCycle });
+      
       toast({
         title: "Processando...",
         description: "Criando sua assinatura...",
@@ -138,11 +140,14 @@ export default function PlanSelection() {
         }
       });
 
+      console.log('Supabase function response:', { data, error });
+
       if (error) {
+        console.error('Supabase function error:', error);
         throw error;
       }
 
-      if (data.success && data.paymentUrl) {
+      if (data && data.success && data.paymentUrl) {
         toast({
           title: "Assinatura Criada!",
           description: "Redirecionando para o pagamento...",
@@ -156,7 +161,8 @@ export default function PlanSelection() {
           navigate('/dashboard-negocio');
         }, 2000);
       } else {
-        throw new Error(data.error || 'Erro ao criar assinatura');
+        console.error('Invalid response data:', data);
+        throw new Error(data?.error || 'Resposta inválida do servidor');
       }
       
     } catch (error) {
