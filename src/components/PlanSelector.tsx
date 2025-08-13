@@ -62,49 +62,69 @@ const PlanSelector = ({ currentPlan, onPlanSelect, businessId }: PlanSelectorPro
 
   const getPlanIcon = (planName: string) => {
     switch (planName) {
-      case 'basic':
+      case 'iniciante':
         return <Star className="h-5 w-5" />;
-      case 'pro':
+      case 'intermediario':
         return <Zap className="h-5 w-5" />;
-      case 'premium':
+      case 'master':
         return <Crown className="h-5 w-5" />;
       default:
         return <Star className="h-5 w-5" />;
     }
   };
 
-  const formatPrice = (monthly: number, yearly: number) => {
-    if (monthly === 0) return "Grátis";
-    
-    const price = isYearly ? yearly / 12 : monthly;
-    const fullPrice = isYearly ? yearly : monthly;
-    
-    return (
-      <div>
-        <span className="text-3xl font-bold">R$ {price.toFixed(2)}</span>
-        <span className="text-muted-foreground">/mês</span>
-        {isYearly && (
-          <div className="text-sm text-muted-foreground">
-            R$ {fullPrice.toFixed(2)} cobrado anualmente
-          </div>
-        )}
-      </div>
-    );
+  const formatPrice = (monthlyPrice: number, yearlyPrice: number, features: any) => {
+    if (isYearly) {
+      return `R$ ${yearlyPrice.toFixed(2)}/ano`;
+    } else {
+      return `R$ ${monthlyPrice.toFixed(2)}/mês`;
+    }
   };
 
-  const getFeaturesList = (features: Record<string, any>) => {
-    const featureMap: Record<string, string> = {
-      gallery_images: `${features.gallery_images} imagens na galeria`,
-      featured_listing: features.featured_listing ? 'Listagem em destaque' : null,
-      analytics: features.analytics === 'advanced' ? 'Analytics avançado' : 'Analytics básico',
-      support: features.support === 'priority' ? 'Suporte prioritário' : 'Suporte da comunidade',
-      custom_domain: features.custom_domain ? 'Domínio personalizado' : null,
-      api_access: features.api_access ? 'Acesso à API' : null
-    };
+  const getSemestralPrice = (features: any) => {
+    return features?.semestral_price || 0;
+  };
 
-    return Object.entries(featureMap)
-      .filter(([_, value]) => value !== null)
-      .map(([key, value]) => ({ key, value: value as string }));
+  const getFeaturesList = (features: any) => {
+    const featureList = [];
+    
+    if (features.business_profiles) {
+      featureList.push(`${features.business_profiles} ${features.business_profiles === 1 ? 'Perfil de Negócio exclusivo' : 'Perfis de Negócios exclusivos'} no site`);
+    }
+    
+    if (features.priority_display) {
+      featureList.push('Perfil com prioridade de exibição');
+    }
+    
+    if (features.featured_display) {
+      featureList.push('Perfil com exibição em destaque');
+    }
+    
+    if (features.whatsapp_community) {
+      featureList.push('Fazer parte da comunidade no WhatsApp');
+    }
+    
+    if (features.recorded_content) {
+      featureList.push('Acesso aos conteúdos gravados');
+    }
+    
+    if (features.event_discount_percent) {
+      featureList.push(`${features.event_discount_percent}% de Desconto em eventos Presenciais`);
+    }
+    
+    if (features.course_info) {
+      featureList.push('Informações sobre cursos e eventos na comunidade');
+    }
+    
+    if (features.social_visibility) {
+      featureList.push('Visibilidade e divulgação nas redes sociais');
+    }
+    
+    if (features.mentoring_hours && features.mentoring_hours > 0) {
+      featureList.push(`+${features.mentoring_hours}h de mentoria por mês`);
+    }
+    
+    return featureList;
   };
 
   if (loading) {
@@ -169,14 +189,10 @@ const PlanSelector = ({ currentPlan, onPlanSelect, businessId }: PlanSelectorPro
           return (
             <Card 
               key={plan.id} 
-              className={`relative transition-all hover:shadow-lg ${
-                plan.is_featured 
-                  ? 'border-primary ring-2 ring-primary ring-opacity-50' 
-                  : ''
+              className={`relative transition-all duration-200 hover:shadow-lg ${
+                plan.is_featured ? 'border-primary shadow-md scale-105' : ''
               } ${
-                isCurrentPlan 
-                  ? 'border-primary bg-primary/5' 
-                  : ''
+                isCurrentPlan ? 'border-primary bg-primary/5' : ''
               }`}
             >
               {plan.is_featured && (
@@ -186,47 +202,48 @@ const PlanSelector = ({ currentPlan, onPlanSelect, businessId }: PlanSelectorPro
                   </Badge>
                 </div>
               )}
-              
+
               <CardHeader className="text-center">
-                <div className="mx-auto mb-4 p-3 bg-primary/10 rounded-full w-fit">
+                <CardTitle className="flex items-center justify-center gap-2 text-xl">
                   {getPlanIcon(plan.name)}
-                </div>
-                
-                <CardTitle className="flex items-center justify-center gap-2">
                   {plan.display_name}
                   {isCurrentPlan && (
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge variant="secondary" className="ml-2">
                       Atual
                     </Badge>
                   )}
                 </CardTitle>
-                
-                <div className="py-4">
-                  {formatPrice(plan.price_monthly, plan.price_yearly)}
-                </div>
+                <CardDescription className="text-2xl font-bold text-foreground">
+                  {formatPrice(plan.price_monthly, plan.price_yearly, plan.features)}
+                </CardDescription>
+                {!isYearly && (
+                  <p className="text-sm text-muted-foreground">
+                    Semestral: R$ {getSemestralPrice(plan.features).toFixed(2)}
+                  </p>
+                )}
               </CardHeader>
-              
-              <CardContent className="space-y-4">
-                <ul className="space-y-3">
-                  {features.map((feature) => (
-                    <li key={feature.key} className="flex items-start gap-2">
-                      <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                      <span className="text-sm">{feature.value}</span>
-                    </li>
+
+              <CardContent>
+                <div className="space-y-3 mb-6">
+                  {features.map((feature, index) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span className="text-sm">{feature}</span>
+                    </div>
                   ))}
-                </ul>
-                
-                <Button 
-                  className="w-full"
+                </div>
+
+                <Button
                   variant={isCurrentPlan ? "secondary" : plan.is_featured ? "default" : "outline"}
+                  className="w-full"
                   disabled={isCurrentPlan}
                   onClick={() => onPlanSelect(plan.id)}
                 >
                   {isCurrentPlan 
                     ? 'Plano Atual' 
-                    : plan.price_monthly === 0 
-                      ? 'Começar Grátis' 
-                      : 'Assinar Agora'
+                    : plan.name === 'iniciante' 
+                      ? 'Escolher Plano' 
+                      : 'Escolher Plano'
                   }
                 </Button>
               </CardContent>

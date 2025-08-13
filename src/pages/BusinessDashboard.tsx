@@ -33,6 +33,8 @@ import BusinessHoursManager from "@/components/BusinessHoursManager";
 import PlanSelector from "@/components/PlanSelector";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useSubscription } from "@/hooks/useSubscription";
+import { useNavigate } from "react-router-dom";
 
 type BusinessCategory = 
   | 'alimentacao'
@@ -84,6 +86,8 @@ const BusinessDashboard = () => {
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<Partial<Business>>({});
   const { toast } = useToast();
+  const { hasActiveSubscription, loading: subscriptionLoading } = useSubscription();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchUserBusiness();
@@ -244,13 +248,44 @@ const BusinessDashboard = () => {
     { value: 'marketing', label: 'Marketing' }
   ];
 
-  if (loading) {
+  if (loading || subscriptionLoading) {
     return (
       <Layout>
         <div className="container mx-auto section-padding">
           <div className="text-center">
             <h1 className="font-bold mb-4">Carregando dashboard...</h1>
           </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Verificar se o usuário tem assinatura ativa
+  if (!hasActiveSubscription) {
+    return (
+      <Layout>
+        <div className="container mx-auto section-padding">
+          <Card className="max-w-2xl mx-auto text-center">
+            <CardHeader>
+              <CardTitle className="text-2xl text-destructive">Assinatura Necessária</CardTitle>
+              <CardDescription className="text-lg">
+                Você precisa de uma assinatura ativa para acessar o dashboard do negócio
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                Para cadastrar e gerenciar seu negócio no diretório, é necessário ter um plano ativo.
+              </p>
+              <div className="flex gap-4 justify-center">
+                <Button onClick={() => navigate('/planos')} className="flex-1 max-w-xs">
+                  Ver Planos Disponíveis
+                </Button>
+                <Button variant="outline" onClick={() => navigate('/dashboard')} className="flex-1 max-w-xs">
+                  Voltar ao Dashboard
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </Layout>
     );
@@ -716,10 +751,7 @@ const BusinessDashboard = () => {
             <PlanSelector 
               currentPlan={business?.subscription_plan}
               onPlanSelect={(planId) => {
-                toast({
-                  title: "Upgrade de Plano",
-                  description: "Funcionalidade de pagamento em desenvolvimento",
-                });
+                navigate('/planos');
               }}
               businessId={business?.id}
             />

@@ -170,7 +170,7 @@ export default function PlanSelection() {
           // Redirecionar para dashboard após um tempo
           setTimeout(() => {
             console.log('Navigating to dashboard...');
-            navigate('/dashboard-negocio');
+            navigate('/dashboard');
           }, 2000);
         } else {
           console.log('Payment window blocked, redirecting directly...');
