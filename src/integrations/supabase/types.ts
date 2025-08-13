@@ -267,7 +267,7 @@ export type Database = {
       business_subscriptions: {
         Row: {
           auto_renew: boolean | null
-          business_id: string
+          business_id: string | null
           created_at: string | null
           expires_at: string | null
           external_subscription_id: string | null
@@ -280,7 +280,7 @@ export type Database = {
         }
         Insert: {
           auto_renew?: boolean | null
-          business_id: string
+          business_id?: string | null
           created_at?: string | null
           expires_at?: string | null
           external_subscription_id?: string | null
@@ -293,7 +293,7 @@ export type Database = {
         }
         Update: {
           auto_renew?: boolean | null
-          business_id?: string
+          business_id?: string | null
           created_at?: string | null
           expires_at?: string | null
           external_subscription_id?: string | null
@@ -949,6 +949,59 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_subscriptions: {
+        Row: {
+          auto_renew: boolean | null
+          billing_cycle: string
+          created_at: string | null
+          expires_at: string | null
+          external_subscription_id: string | null
+          id: string
+          payment_provider: string | null
+          plan_id: string
+          starts_at: string
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          auto_renew?: boolean | null
+          billing_cycle?: string
+          created_at?: string | null
+          expires_at?: string | null
+          external_subscription_id?: string | null
+          id?: string
+          payment_provider?: string | null
+          plan_id: string
+          starts_at?: string
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          auto_renew?: boolean | null
+          billing_cycle?: string
+          created_at?: string | null
+          expires_at?: string | null
+          external_subscription_id?: string | null
+          id?: string
+          payment_provider?: string | null
+          plan_id?: string
+          starts_at?: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
             referencedColumns: ["id"]
           },
         ]

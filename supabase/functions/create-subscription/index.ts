@@ -191,15 +191,16 @@ serve(async (req) => {
       status: subscriptionResult.status 
     });
 
-    // Salvar assinatura no banco de dados
+    // Salvar assinatura no banco de dados (na tabela de assinaturas de usuário)
     const { error: insertError } = await supabaseService
-      .from('business_subscriptions')
+      .from('user_subscriptions')
       .insert({
-        business_id: null, // Será preenchido quando o negócio for criado
+        user_id: user.id,
         plan_id: planId,
         status: 'pending',
         payment_provider: 'asaas',
         external_subscription_id: subscriptionResult.id,
+        billing_cycle: billingCycle,
         starts_at: new Date().toISOString(),
         expires_at: billingCycle === 'yearly' 
           ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
