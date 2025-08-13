@@ -1,5 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BusinessMapProps {
   latitude: number;
@@ -17,16 +18,23 @@ declare global {
 const BusinessMap = ({ latitude, longitude, businessName, address }: BusinessMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
+  const [apiKey, setApiKey] = useState<string | null>(null);
 
   useEffect(() => {
-    // Load Google Maps API if not already loaded
-    if (!window.google) {
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_PLACES_API_KEY}`;
-      script.onload = initializeMap;
-      document.head.appendChild(script);
-    } else {
-      initializeMap();
+    loadGoogleApiKey();
+  }, []);
+
+  useEffect(() => {
+    if (apiKey) {
+      // Load Google Maps API if not already loaded
+      if (!window.google) {
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}`;
+        script.onload = initializeMap;
+        document.head.appendChild(script);
+      } else {
+        initializeMap();
+      }
     }
 
     return () => {
@@ -34,7 +42,22 @@ const BusinessMap = ({ latitude, longitude, businessName, address }: BusinessMap
         mapInstanceRef.current = null;
       }
     };
-  }, [latitude, longitude]);
+  }, [apiKey, latitude, longitude]);
+
+  const loadGoogleApiKey = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('get-google-api-key');
+      
+      if (error) {
+        console.error('Error loading Google API key:', error);
+        return;
+      }
+
+      setApiKey(data.apiKey);
+    } catch (error) {
+      console.error('Error calling get-google-api-key function:', error);
+    }
+  };
 
   const initializeMap = () => {
     if (!mapRef.current || !window.google) return;

@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MapPin, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface LocationSearchProps {
   onLocationSelect: (location: {
@@ -25,19 +26,26 @@ declare global {
 const LocationSearch = ({ onLocationSelect, placeholder = "Digite um endereço...", value }: LocationSearchProps) => {
   const [inputValue, setInputValue] = useState(value || "");
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [apiKey, setApiKey] = useState<string | null>(null);
   const autocompleteRef = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Load Google Maps API if not already loaded
-    if (!window.google) {
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_PLACES_API_KEY}&libraries=places`;
-      script.onload = initializeAutocomplete;
-      document.head.appendChild(script);
-    } else {
-      initializeAutocomplete();
+    loadGoogleApiKey();
+  }, []);
+
+  useEffect(() => {
+    if (apiKey) {
+      // Load Google Maps API if not already loaded
+      if (!window.google) {
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+        script.onload = initializeAutocomplete;
+        document.head.appendChild(script);
+      } else {
+        initializeAutocomplete();
+      }
     }
 
     return () => {
@@ -45,7 +53,32 @@ const LocationSearch = ({ onLocationSelect, placeholder = "Digite um endereço..
         window.google?.maps?.event?.clearInstanceListeners(autocompleteRef.current);
       }
     };
-  }, []);
+  }, [apiKey]);
+
+  const loadGoogleApiKey = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('get-google-api-key');
+      
+      if (error) {
+        console.error('Error loading Google API key:', error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível carregar a API do Google Maps",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setApiKey(data.apiKey);
+    } catch (error) {
+      console.error('Error calling get-google-api-key function:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar a API do Google Maps",
+        variant: "destructive"
+      });
+    }
+  };
 
   const initializeAutocomplete = () => {
     if (!inputRef.current || !window.google) return;

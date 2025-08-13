@@ -401,6 +401,18 @@ const Directory = () => {
                     <div className="flex items-center text-sm text-muted-foreground mt-2">
                       <MapPin className="h-4 w-4 mr-1" />
                       <span>{business.city}, {business.state}</span>
+                      
+                      {/* Show distance when using location filter */}
+                      {useLocationFilter && userLocation && business.latitude && business.longitude && (
+                        <span className="ml-2 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                          {calculateDistance(
+                            userLocation.lat,
+                            userLocation.lng,
+                            business.latitude,
+                            business.longitude
+                          ).toFixed(1)} km
+                        </span>
+                      )}
                     </div>
                   </CardHeader>
 
