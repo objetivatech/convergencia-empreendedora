@@ -5,8 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, ShoppingCart, User, Heart } from "lucide-react";
 import { useCartStore } from "@/hooks/useCartStore";
-import logoHorizontal from "@/assets/logo-horizontal.png";
-import logoIcon from "@/assets/logo-icon.png";
 
 const Navigation = () => {
   const location = useLocation();
@@ -34,12 +32,12 @@ const Navigation = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <img 
-              src={logoIcon} 
+              src="/lovable-uploads/5eba316e-250b-4229-91de-5bccaefa8515.png" 
               alt="Mulheres em Convergência" 
               className="h-8 w-8"
             />
             <img 
-              src={logoHorizontal} 
+              src="/lovable-uploads/3b711630-8458-4762-a6b3-8ae0311681f8.png" 
               alt="Mulheres em Convergência" 
               className="h-6 hidden sm:block"
             />
