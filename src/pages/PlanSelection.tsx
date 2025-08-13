@@ -147,26 +147,38 @@ export default function PlanSelection() {
         throw new Error(error.message || 'Erro na função do servidor');
       }
 
+      console.log('Checking if data exists:', !!data);
+      console.log('Checking data.success:', data?.success);
+      console.log('Checking data.paymentUrl:', data?.paymentUrl);
+
       if (data?.success && data?.paymentUrl) {
+        console.log('Success condition met, proceeding with payment...');
+        
         toast({
           title: "Assinatura Criada!",
           description: "Redirecionando para o pagamento...",
         });
         
+        console.log('About to open payment URL:', data.paymentUrl);
+        
         // Abrir URL de pagamento em nova aba
         const paymentWindow = window.open(data.paymentUrl, '_blank');
+        console.log('Payment window opened:', !!paymentWindow);
         
         if (paymentWindow) {
+          console.log('Payment window opened successfully, will navigate to dashboard in 2 seconds');
           // Redirecionar para dashboard após um tempo
           setTimeout(() => {
+            console.log('Navigating to dashboard...');
             navigate('/dashboard-negocio');
           }, 2000);
         } else {
+          console.log('Payment window blocked, redirecting directly...');
           // Se não conseguiu abrir a janela, redirecionar para o URL de pagamento
           window.location.href = data.paymentUrl;
         }
       } else {
-        console.error('Invalid response data:', data);
+        console.error('Success condition not met. Data:', data);
         throw new Error(data?.error || 'Resposta inválida do servidor');
       }
       
