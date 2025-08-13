@@ -141,12 +141,17 @@ export default function PlanSelection() {
       });
 
       console.log('Supabase function response:', { data, error });
+      console.log('Data details:', JSON.stringify(data, null, 2));
+      console.log('Error details:', JSON.stringify(error, null, 2));
 
       if (error) {
         console.error('Supabase function error:', error);
         throw error;
       }
 
+      console.log('Checking data.success:', data?.success);
+      console.log('Checking data.paymentUrl:', data?.paymentUrl);
+      
       if (data && data.success && data.paymentUrl) {
         toast({
           title: "Assinatura Criada!",
@@ -162,6 +167,9 @@ export default function PlanSelection() {
         }, 2000);
       } else {
         console.error('Invalid response data:', data);
+        console.error('Data success:', data?.success);
+        console.error('Data paymentUrl:', data?.paymentUrl);
+        console.error('Data error:', data?.error);
         throw new Error(data?.error || 'Resposta inválida do servidor');
       }
       

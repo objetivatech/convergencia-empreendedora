@@ -235,10 +235,17 @@ serve(async (req) => {
     }
 
     // Retornar URL de pagamento (invoiceUrl do ASAAS)
+    logStep("Subscription response from ASAAS", {
+      id: subscriptionResult.id,
+      status: subscriptionResult.status,
+      invoiceUrl: subscriptionResult.invoiceUrl,
+      hasInvoiceUrl: !!subscriptionResult.invoiceUrl
+    });
+
     return new Response(JSON.stringify({
       success: true,
       subscriptionId: subscriptionResult.id,
-      paymentUrl: subscriptionResult.invoiceUrl,
+      paymentUrl: subscriptionResult.invoiceUrl || `https://www.asaas.com/c/${subscriptionResult.id}`,
       status: subscriptionResult.status
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
