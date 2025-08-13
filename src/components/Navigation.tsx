@@ -24,6 +24,7 @@ const Navigation = () => {
     { href: "/loja", label: "Loja" },
     { href: "/diretorio", label: "Convergentes" },
     { href: "/dashboard-negocio", label: "Meu Negócio" },
+    { href: "/dashboard-embaixadora", label: "Dashboard Embaixadora" },
     { href: "/comunidade", label: "Comunidade" },
   ];
 

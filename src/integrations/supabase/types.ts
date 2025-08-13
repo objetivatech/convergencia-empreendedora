@@ -917,9 +917,22 @@ export type Database = {
         }
         Returns: string
       }
+      get_ambassador_by_referral: {
+        Args: { referral_code: string }
+        Returns: {
+          id: string
+          user_id: string
+          commission_rate: number
+          asaas_split_config: Json
+        }[]
+      }
       get_google_places_api_key: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      track_referral_click: {
+        Args: { referral_code: string }
+        Returns: undefined
       }
     }
     Enums: {

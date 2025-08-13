@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Layout } from "@/components/Layout";
+import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,8 +89,8 @@ export default function AmbassadorDashboard() {
       setAmbassador(newAmbassador);
     } else {
       setAmbassador(ambassadorData);
-      if (ambassadorData.asaas_split_config?.wallet_id) {
-        setAsaasWalletKey(ambassadorData.asaas_split_config.wallet_id);
+      if (ambassadorData.asaas_split_config && typeof ambassadorData.asaas_split_config === 'object' && 'wallet_id' in ambassadorData.asaas_split_config) {
+        setAsaasWalletKey(ambassadorData.asaas_split_config.wallet_id as string);
       }
     }
 
@@ -106,7 +106,7 @@ export default function AmbassadorDashboard() {
         products (name)
       `)
       .eq("ambassador_id", ambassadorData?.id || "")
-      .eq("status", "paid")
+      .eq("status", "completed")
       .order("created_at", { ascending: false })
       .limit(10);
 

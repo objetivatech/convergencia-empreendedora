@@ -13,9 +13,9 @@ export const useReferralTracking = () => {
           // Store referral code in sessionStorage for the user session
           sessionStorage.setItem('referralCode', referralCode);
           
-          // Track the click
-          const { error } = await supabase.rpc('track_referral_click', {
-            referral_code: referralCode
+          // Track the click by calling the edge function
+          const { error } = await supabase.functions.invoke('track-referral-click', {
+            body: { referral_code: referralCode }
           });
           
           if (error) {

@@ -13,6 +13,7 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import Directory from "./pages/Directory";
 import BusinessProfile from "./pages/BusinessProfile";
 import BusinessDashboard from "./pages/BusinessDashboard";
+import AmbassadorDashboard from "./pages/AmbassadorDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/diretorio" element={<Directory />} />
           <Route path="/diretorio/:id" element={<BusinessProfile />} />
           <Route path="/dashboard-negocio" element={<BusinessDashboard />} />
+          <Route path="/dashboard-embaixadora" element={<AmbassadorDashboard />} />
           {/* Legacy routes */}
           <Route path="/about" element={<About />} />
           <Route path="/projects" element={<Projects />} />
