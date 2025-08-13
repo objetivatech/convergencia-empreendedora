@@ -264,6 +264,63 @@ export type Database = {
           },
         ]
       }
+      business_subscriptions: {
+        Row: {
+          auto_renew: boolean | null
+          business_id: string
+          created_at: string | null
+          expires_at: string | null
+          external_subscription_id: string | null
+          id: string
+          payment_provider: string | null
+          plan_id: string
+          starts_at: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          auto_renew?: boolean | null
+          business_id: string
+          created_at?: string | null
+          expires_at?: string | null
+          external_subscription_id?: string | null
+          id?: string
+          payment_provider?: string | null
+          plan_id: string
+          starts_at?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          auto_renew?: boolean | null
+          business_id?: string
+          created_at?: string | null
+          expires_at?: string | null
+          external_subscription_id?: string | null
+          id?: string
+          payment_provider?: string | null
+          plan_id?: string
+          starts_at?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_subscriptions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       businesses: {
         Row: {
           address: string | null
@@ -286,6 +343,7 @@ export type Database = {
           opening_hours: Json | null
           owner_id: string | null
           phone: string | null
+          plan_features: Json | null
           postal_code: string | null
           state: string | null
           subcategory: string | null
@@ -318,6 +376,7 @@ export type Database = {
           opening_hours?: Json | null
           owner_id?: string | null
           phone?: string | null
+          plan_features?: Json | null
           postal_code?: string | null
           state?: string | null
           subcategory?: string | null
@@ -350,6 +409,7 @@ export type Database = {
           opening_hours?: Json | null
           owner_id?: string | null
           phone?: string | null
+          plan_features?: Json | null
           postal_code?: string | null
           state?: string | null
           subcategory?: string | null
@@ -627,6 +687,51 @@ export type Database = {
             | null
           updated_at?: string | null
           user_types?: Database["public"]["Enums"]["user_type"][] | null
+        }
+        Relationships: []
+      }
+      subscription_plans: {
+        Row: {
+          created_at: string | null
+          display_name: string
+          features: Json
+          id: string
+          is_active: boolean | null
+          is_featured: boolean | null
+          limits: Json
+          name: string
+          price_monthly: number
+          price_yearly: number
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_name: string
+          features?: Json
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          limits?: Json
+          name: string
+          price_monthly?: number
+          price_yearly?: number
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_name?: string
+          features?: Json
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          limits?: Json
+          name?: string
+          price_monthly?: number
+          price_yearly?: number
+          sort_order?: number | null
+          updated_at?: string | null
         }
         Relationships: []
       }
