@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import Layout from "@/components/Layout";
 import BusinessMap from "@/components/BusinessMap";
+import BusinessReviews from "@/components/BusinessReviews";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Business {
@@ -339,6 +340,9 @@ const BusinessProfile = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Business Reviews */}
+            <BusinessReviews businessId={business.id} businessName={business.name} />
           </div>
 
           {/* Sidebar */}

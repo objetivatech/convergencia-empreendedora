@@ -211,6 +211,59 @@ export type Database = {
         }
         Relationships: []
       }
+      business_reviews: {
+        Row: {
+          business_id: string
+          comment: string | null
+          created_at: string | null
+          helpful_count: number | null
+          id: string
+          rating: number
+          reviewer_email: string | null
+          reviewer_id: string | null
+          reviewer_name: string
+          title: string | null
+          updated_at: string | null
+          verified: boolean | null
+        }
+        Insert: {
+          business_id: string
+          comment?: string | null
+          created_at?: string | null
+          helpful_count?: number | null
+          id?: string
+          rating: number
+          reviewer_email?: string | null
+          reviewer_id?: string | null
+          reviewer_name: string
+          title?: string | null
+          updated_at?: string | null
+          verified?: boolean | null
+        }
+        Update: {
+          business_id?: string
+          comment?: string | null
+          created_at?: string | null
+          helpful_count?: number | null
+          id?: string
+          rating?: number
+          reviewer_email?: string | null
+          reviewer_id?: string | null
+          reviewer_name?: string
+          title?: string | null
+          updated_at?: string | null
+          verified?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_reviews_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       businesses: {
         Row: {
           address: string | null
@@ -698,6 +751,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_business_rating: {
+        Args: { business_uuid: string }
+        Returns: {
+          average_rating: number
+          total_reviews: number
+          rating_distribution: Json
+        }[]
+      }
       get_google_places_api_key: {
         Args: Record<PropertyKey, never>
         Returns: string
