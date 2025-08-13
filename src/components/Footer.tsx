@@ -12,7 +12,7 @@ const Footer = () => {
               <img 
                 src="/lovable-uploads/cae4c859-e76c-4a0a-ae39-475f08b8afec.png" 
                 alt="Mulheres em Convergência" 
-                className="h-8"
+                className="h-16"
               />
             </div>
             <p className="text-white/80 mb-4 max-w-md">

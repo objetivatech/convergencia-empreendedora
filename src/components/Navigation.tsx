@@ -34,7 +34,7 @@ const Navigation = () => {
             <img 
               src="/lovable-uploads/07fc5569-e601-40a0-85f0-0521b206817f.png" 
               alt="Mulheres em Convergência" 
-              className="h-8"
+              className="h-16"
             />
           </Link>
 
