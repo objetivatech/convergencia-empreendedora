@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, Users, Target, Award, ArrowRight, Star } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
 import Layout from "@/components/Layout";
+import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 
 const Home = () => {
   return (
@@ -138,80 +139,11 @@ const Home = () => {
           <div className="text-center mb-12 md:mb-16">
             <h2 className="font-bold mb-4 text-responsive">O que nossas participantes dizem</h2>
             <p className="text-lg md:text-xl text-muted-foreground text-responsive">
-              Histórias reais de transformação e crescimento
+              Depoimentos reais do Google My Business
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-            <Card>
-              <CardContent className="card-padding">
-                <div className="flex mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 fill-primary text-primary" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  "A plataforma me ajudou a conectar com outras empreendedoras e expandir meu negócio 
-                  de forma sustentável. Hoje tenho uma rede de apoio incrível!"
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold mr-3">
-                    M
-                  </div>
-                  <div>
-                    <div className="font-semibold">Maria Silva</div>
-                    <div className="text-sm text-muted-foreground">Fundadora da EcoBeauty</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="card-padding">
-                <div className="flex mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 fill-primary text-primary" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  "Os cursos e workshops oferecidos são de altíssima qualidade. Aprendi conceitos 
-                  fundamentais que aplicei imediatamente em minha empresa."
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-secondary rounded-full flex items-center justify-center text-white font-bold mr-3">
-                    A
-                  </div>
-                  <div>
-                    <div className="font-semibold">Ana Costa</div>
-                    <div className="text-sm text-muted-foreground">CEO da TechWomen</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="card-padding">
-                <div className="flex mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 fill-primary text-primary" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  "Encontrei inspiração e direcionamento para meus projetos. A comunidade é 
-                  acolhedora e sempre disposta a ajudar."
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center text-white font-bold mr-3">
-                    J
-                  </div>
-                  <div>
-                    <div className="font-semibold">Juliana Santos</div>
-                    <div className="text-sm text-muted-foreground">Diretora da ImpactoBr</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <TestimonialsCarousel />
         </div>
       </section>
 

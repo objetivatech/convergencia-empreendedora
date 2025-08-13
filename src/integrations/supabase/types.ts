@@ -577,6 +577,42 @@ export type Database = {
         }
         Relationships: []
       }
+      testimonials: {
+        Row: {
+          author_name: string
+          author_photo_url: string | null
+          created_at: string
+          google_review_id: string | null
+          id: string
+          rating: number
+          review_text: string | null
+          review_time: string
+          updated_at: string
+        }
+        Insert: {
+          author_name: string
+          author_photo_url?: string | null
+          created_at?: string
+          google_review_id?: string | null
+          id?: string
+          rating: number
+          review_text?: string | null
+          review_time: string
+          updated_at?: string
+        }
+        Update: {
+          author_name?: string
+          author_photo_url?: string | null
+          created_at?: string
+          google_review_id?: string | null
+          id?: string
+          rating?: number
+          review_text?: string | null
+          review_time?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           ambassador_id: string | null
