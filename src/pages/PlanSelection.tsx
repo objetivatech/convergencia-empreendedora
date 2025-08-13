@@ -141,39 +141,36 @@ export default function PlanSelection() {
       });
 
       console.log('Supabase function response:', { data, error });
-      console.log('Data details:', JSON.stringify(data, null, 2));
-      console.log('Error details:', JSON.stringify(error, null, 2));
 
       if (error) {
         console.error('Supabase function error:', error);
-        throw error;
+        throw new Error(error.message || 'Erro na função do servidor');
       }
 
-      console.log('Checking data.success:', data?.success);
-      console.log('Checking data.paymentUrl:', data?.paymentUrl);
-      
-      if (data && data.success && data.paymentUrl) {
+      if (data?.success && data?.paymentUrl) {
         toast({
           title: "Assinatura Criada!",
           description: "Redirecionando para o pagamento...",
         });
         
         // Abrir URL de pagamento em nova aba
-        window.open(data.paymentUrl, '_blank');
+        const paymentWindow = window.open(data.paymentUrl, '_blank');
         
-        // Redirecionar para dashboard após um tempo
-        setTimeout(() => {
-          navigate('/dashboard-negocio');
-        }, 2000);
+        if (paymentWindow) {
+          // Redirecionar para dashboard após um tempo
+          setTimeout(() => {
+            navigate('/dashboard-negocio');
+          }, 2000);
+        } else {
+          // Se não conseguiu abrir a janela, redirecionar para o URL de pagamento
+          window.location.href = data.paymentUrl;
+        }
       } else {
         console.error('Invalid response data:', data);
-        console.error('Data success:', data?.success);
-        console.error('Data paymentUrl:', data?.paymentUrl);
-        console.error('Data error:', data?.error);
         throw new Error(data?.error || 'Resposta inválida do servidor');
       }
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error selecting plan:', error);
       toast({
         title: "Erro",
