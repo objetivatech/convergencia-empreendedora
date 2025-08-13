@@ -68,7 +68,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Business Dashboard */}
           {hasRole('business_owner') ? (
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/dashboard-negocio")}>
+            <Card className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Building2 className="h-5 w-5 text-primary" />
@@ -79,7 +79,10 @@ export default function Dashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full">
+                <Button 
+                  className="w-full"
+                  onClick={() => navigate("/dashboard-negocio")}
+                >
                   Acessar Dashboard
                 </Button>
               </CardContent>
@@ -111,7 +114,7 @@ export default function Dashboard() {
 
           {/* Ambassador Dashboard */}
           {hasRole('ambassador') ? (
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/dashboard-embaixadora")}>
+            <Card className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-primary" />
@@ -122,7 +125,10 @@ export default function Dashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full">
+                <Button 
+                  className="w-full"
+                  onClick={() => navigate("/dashboard-embaixadora")}
+                >
                   Acessar Dashboard
                 </Button>
               </CardContent>
@@ -153,7 +159,7 @@ export default function Dashboard() {
           )}
 
           {/* Shop/Orders */}
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/loja")}>
+          <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ShoppingCart className="h-5 w-5 text-primary" />
@@ -164,7 +170,10 @@ export default function Dashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full">
+              <Button 
+                className="w-full"
+                onClick={() => navigate("/loja")}
+              >
                 Ver Compras
               </Button>
             </CardContent>
