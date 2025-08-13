@@ -4,9 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, MapPin, Phone, Mail, Globe, Instagram, MessageCircle, Eye, MousePointer, Users } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
+import { Search, MapPin, Phone, Mail, Globe, Instagram, MessageCircle, Eye, MousePointer, Users, Navigation } from "lucide-react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
+import LocationSearch from "@/components/LocationSearch";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Business {
@@ -42,6 +45,9 @@ const Directory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
+  const [userLocation, setUserLocation] = useState<{lat: number; lng: number} | null>(null);
+  const [searchRadius, setSearchRadius] = useState([10]); // km
+  const [useLocationFilter, setUseLocationFilter] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -50,7 +56,20 @@ const Directory = () => {
 
   useEffect(() => {
     filterBusinesses();
-  }, [businesses, searchTerm, selectedCategory, selectedCity]);
+  }, [businesses, searchTerm, selectedCategory, selectedCity, userLocation, searchRadius, useLocationFilter]);
+
+  // Calculate distance between two coordinates (Haversine formula)
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
 
   const fetchBusinesses = async () => {
     try {
@@ -89,7 +108,38 @@ const Directory = () => {
       filtered = filtered.filter(business => business.city === selectedCity);
     }
 
+    // Filter by location and radius
+    if (useLocationFilter && userLocation) {
+      filtered = filtered.filter(business => {
+        if (!business.latitude || !business.longitude) return false;
+        
+        const distance = calculateDistance(
+          userLocation.lat,
+          userLocation.lng,
+          business.latitude,
+          business.longitude
+        );
+        
+        return distance <= searchRadius[0];
+      });
+
+      // Sort by distance when using location filter
+      filtered.sort((a, b) => {
+        if (!a.latitude || !a.longitude || !b.latitude || !b.longitude) return 0;
+        
+        const distanceA = calculateDistance(userLocation.lat, userLocation.lng, a.latitude, a.longitude);
+        const distanceB = calculateDistance(userLocation.lat, userLocation.lng, b.latitude, b.longitude);
+        
+        return distanceA - distanceB;
+      });
+    }
+
     setFilteredBusinesses(filtered);
+  };
+
+  const handleLocationSelect = (location: { address: string; lat: number; lng: number; city: string; state: string }) => {
+    setUserLocation({ lat: location.lat, lng: location.lng });
+    setUseLocationFilter(true);
   };
 
   const updateBusinessMetrics = async (businessId: string, metricType: 'view' | 'click' | 'contact') => {
@@ -177,6 +227,57 @@ const Directory = () => {
         </div>
       </section>
 
+      {/* Location Search */}
+      <section className="bg-gradient-to-b from-muted/30 to-white border-b">
+        <div className="container mx-auto py-6">
+          <div className="max-w-2xl mx-auto">
+            <div className="text-center mb-4">
+              <h2 className="text-lg font-semibold mb-2">Buscar por Localização</h2>
+              <p className="text-sm text-muted-foreground">
+                Encontre negócios próximos a você ou a um endereço específico
+              </p>
+            </div>
+            
+            <div className="space-y-4">
+              <LocationSearch 
+                onLocationSelect={handleLocationSelect}
+                placeholder="Digite um endereço ou use sua localização atual..."
+              />
+              
+              {useLocationFilter && userLocation && (
+                <div className="bg-white rounded-lg p-4 border space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="radius" className="text-sm font-medium">
+                      Raio de busca: {searchRadius[0]} km
+                    </Label>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setUseLocationFilter(false);
+                        setUserLocation(null);
+                      }}
+                    >
+                      <Navigation className="h-4 w-4 mr-1" />
+                      Limpar
+                    </Button>
+                  </div>
+                  <Slider
+                    id="radius"
+                    min={1}
+                    max={50}
+                    step={1}
+                    value={searchRadius}
+                    onValueChange={setSearchRadius}
+                    className="w-full"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Search and Filters */}
       <section className="bg-white shadow-sm border-b">
         <div className="container mx-auto py-6">
@@ -224,6 +325,8 @@ const Directory = () => {
                 setSearchTerm("");
                 setSelectedCategory("all");
                 setSelectedCity("all");
+                setUseLocationFilter(false);
+                setUserLocation(null);
               }}
               variant="outline"
             >

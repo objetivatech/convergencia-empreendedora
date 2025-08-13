@@ -27,6 +27,7 @@ import {
   BarChart3
 } from "lucide-react";
 import Layout from "@/components/Layout";
+import LocationSearch from "@/components/LocationSearch";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -59,6 +60,8 @@ interface Business {
   city: string;
   state: string;
   postal_code: string;
+  latitude?: number;
+  longitude?: number;
   logo_url: string;
   cover_image_url: string;
   gallery_images: string[];
@@ -197,6 +200,17 @@ const BusinessDashboard = () => {
 
   const updateFormData = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleLocationSelect = (location: { address: string; lat: number; lng: number; city: string; state: string }) => {
+    setFormData(prev => ({
+      ...prev,
+      address: location.address,
+      city: location.city,
+      state: location.state,
+      latitude: location.lat,
+      longitude: location.lng
+    }));
   };
 
   const addGalleryImage = () => {
@@ -382,16 +396,21 @@ const BusinessDashboard = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle>Localização</CardTitle>
+                    <CardDescription>
+                      Use o campo abaixo para buscar e selecionar automaticamente o endereço com coordenadas precisas
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <Label htmlFor="address">Endereço</Label>
-                      <Input
-                        id="address"
-                        value={formData.address || ''}
-                        onChange={(e) => updateFormData('address', e.target.value)}
-                        placeholder="Rua, número, bairro"
+                      <Label htmlFor="address">Endereço *</Label>
+                      <LocationSearch
+                        onLocationSelect={handleLocationSelect}
+                        placeholder="Digite o endereço do seu negócio..."
+                        value={formData.address}
                       />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Use o botão de localização para buscar automaticamente ou digite o endereço
+                      </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -402,6 +421,8 @@ const BusinessDashboard = () => {
                           value={formData.city || ''}
                           onChange={(e) => updateFormData('city', e.target.value)}
                           placeholder="São Paulo"
+                          className="bg-muted/50"
+                          readOnly
                         />
                       </div>
 
@@ -412,6 +433,8 @@ const BusinessDashboard = () => {
                           value={formData.state || ''}
                           onChange={(e) => updateFormData('state', e.target.value)}
                           placeholder="SP"
+                          className="bg-muted/50"
+                          readOnly
                         />
                       </div>
 
@@ -425,6 +448,14 @@ const BusinessDashboard = () => {
                         />
                       </div>
                     </div>
+
+                    {formData.latitude && formData.longitude && (
+                      <div className="bg-muted/30 rounded-lg p-3">
+                        <p className="text-xs text-muted-foreground">
+                          📍 Coordenadas: {formData.latitude.toFixed(6)}, {formData.longitude.toFixed(6)}
+                        </p>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 

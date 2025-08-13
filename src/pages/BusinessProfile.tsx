@@ -19,6 +19,7 @@ import {
   Calendar
 } from "lucide-react";
 import Layout from "@/components/Layout";
+import BusinessMap from "@/components/BusinessMap";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Business {
@@ -403,22 +404,14 @@ const BusinessProfile = () => {
               </CardContent>
             </Card>
 
-            {/* Map placeholder */}
+            {/* Interactive Map */}
             {business.latitude && business.longitude && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Localização</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="bg-muted rounded-lg h-48 flex items-center justify-center">
-                    <div className="text-center text-muted-foreground">
-                      <MapPin className="h-8 w-8 mx-auto mb-2" />
-                      <p className="text-sm">Mapa interativo</p>
-                      <p className="text-xs">Em breve</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <BusinessMap
+                latitude={business.latitude}
+                longitude={business.longitude}
+                businessName={business.name}
+                address={`${business.address}, ${business.city}, ${business.state}`}
+              />
             )}
           </div>
         </div>
