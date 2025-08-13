@@ -33,17 +33,17 @@ import { useToast } from "@/components/ui/use-toast";
 
 type BusinessCategory = 
   | 'alimentacao'
-  | 'moda' 
   | 'beleza'
-  | 'servicos'
-  | 'tecnologia'
   | 'educacao'
   | 'saude'
-  | 'consultoria'
+  | 'moda'
+  | 'casa_decoracao'
+  | 'tecnologia'
+  | 'servicos'
   | 'artesanato'
+  | 'consultoria'
   | 'eventos'
-  | 'marketing'
-  | 'outros';
+  | 'marketing';
 
 interface Business {
   id: string;
@@ -232,7 +232,7 @@ const BusinessDashboard = () => {
     { value: 'educacao', label: 'Educação' },
     { value: 'saude', label: 'Saúde e Bem-estar' },
     { value: 'moda', label: 'Moda e Acessórios' },
-    { value: 'outros', label: 'Casa e Decoração' },
+    { value: 'casa_decoracao', label: 'Casa e Decoração' },
     { value: 'tecnologia', label: 'Tecnologia' },
     { value: 'servicos', label: 'Serviços' },
     { value: 'artesanato', label: 'Arte e Artesanato' },

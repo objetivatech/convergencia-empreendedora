@@ -706,17 +706,17 @@ export type Database = {
     Enums: {
       business_category:
         | "alimentacao"
-        | "moda"
         | "beleza"
-        | "servicos"
-        | "tecnologia"
         | "educacao"
         | "saude"
-        | "consultoria"
+        | "moda"
+        | "casa_decoracao"
+        | "tecnologia"
+        | "servicos"
         | "artesanato"
+        | "consultoria"
         | "eventos"
         | "marketing"
-        | "outros"
       post_status: "draft" | "published" | "archived"
       subscription_type:
         | "newsletter"
@@ -860,17 +860,17 @@ export const Constants = {
     Enums: {
       business_category: [
         "alimentacao",
-        "moda",
         "beleza",
-        "servicos",
-        "tecnologia",
         "educacao",
         "saude",
-        "consultoria",
+        "moda",
+        "casa_decoracao",
+        "tecnologia",
+        "servicos",
         "artesanato",
+        "consultoria",
         "eventos",
         "marketing",
-        "outros",
       ],
       post_status: ["draft", "published", "archived"],
       subscription_type: [
