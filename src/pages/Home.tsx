@@ -1,61 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Users, Briefcase, BookOpen, ArrowRight, Mail, Phone, MapPin } from "lucide-react";
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { Heart, Users, Target, Award, ArrowRight, Star } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
+import Layout from "@/components/Layout";
 
 const Home = () => {
-  const [email, setEmail] = useState("");
-  const { toast } = useToast();
-
-  const handleNewsletterSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      // TODO: Implementar inscrição na newsletter
-      toast({
-        title: "Obrigada!",
-        description: "Seu email foi cadastrado com sucesso em nossa newsletter.",
-      });
-      setEmail("");
-    }
-  };
-
   return (
-    <div className="min-h-screen">
-      {/* Header/Navigation */}
-      <header className="bg-white shadow-elegant sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Heart className="h-8 w-8 text-brand-primary" />
-              <h1 className="text-2xl font-bold text-brand-primary font-nexa">
-                Mulheres em Convergência
-              </h1>
-            </div>
-            <nav className="hidden md:flex items-center space-x-6">
-              <a href="#sobre" className="text-gray-dark hover:text-brand-primary transition-smooth">
-                Sobre
-              </a>
-              <a href="#projetos" className="text-gray-dark hover:text-brand-primary transition-smooth">
-                Projetos
-              </a>
-              <a href="#blog" className="text-gray-dark hover:text-brand-primary transition-smooth">
-                Convergindo
-              </a>
-              <a href="#diretorio" className="text-gray-dark hover:text-brand-primary transition-smooth">
-                Diretório
-              </a>
-              <Button variant="default" className="bg-brand-primary hover:bg-brand-primary/90">
-                Entrar
-              </Button>
-            </nav>
-          </div>
-        </div>
-      </header>
-
+    <Layout>
       {/* Hero Section */}
       <section 
         className="relative py-20 text-white overflow-hidden"
@@ -71,16 +23,16 @@ const Home = () => {
             <Badge variant="secondary" className="mb-6 bg-white/20 text-white border-white/30">
               Empoderando Mulheres Empreendedoras
             </Badge>
-            <h2 className="text-5xl md:text-6xl font-bold mb-6 font-nexa">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6">
               Conectando Sonhos, 
               <span className="block text-white/90">Transformando Realidades</span>
-            </h2>
-            <p className="text-xl md:text-2xl mb-8 text-white/90 font-montserrat">
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 text-white/90">
               Um espaço criado para educar, conectar e impulsionar mulheres por meio do 
               empreendedorismo e do fortalecimento de redes de apoio.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-brand-primary hover:bg-white/90 font-androgyne">
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90">
                 Comece Sua Jornada
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -92,157 +44,199 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Seções Principais */}
-      <section className="py-20 bg-gray-50">
+      {/* Valores Section */}
+      <section className="py-20 bg-muted/50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h3 className="text-3xl md:text-4xl font-bold mb-4 text-foreground font-nexa">
-              Nossos Pilares
-            </h3>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
+              Nossos Valores
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Construímos um ecossistema completo para o crescimento feminino no empreendedorismo
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card className="hover:shadow-brand transition-smooth cursor-pointer group">
-              <CardContent className="p-6 text-center">
-                <div className="bg-brand-primary/10 rounded-full p-4 inline-block mb-4 group-hover:bg-brand-primary/20 transition-smooth">
-                  <Users className="h-8 w-8 text-brand-primary" />
+            <Card className="hover:shadow-lg transition-all cursor-pointer group">
+              <CardHeader className="text-center">
+                <div className="bg-primary/10 rounded-full p-4 inline-block mb-4 group-hover:bg-primary/20 transition-colors">
+                  <Heart className="h-8 w-8 text-primary" />
                 </div>
-                <h4 className="text-xl font-bold mb-2 font-montserrat">Comunidade</h4>
-                <p className="text-muted-foreground">
-                  Conecte-se com outras empreendedoras, compartilhe experiências e cresça juntas.
-                </p>
-              </CardContent>
+                <CardTitle>Empoderamento</CardTitle>
+                <CardDescription>
+                  Fortalecemos mulheres através da educação e oportunidades de crescimento.
+                </CardDescription>
+              </CardHeader>
             </Card>
 
-            <Card className="hover:shadow-brand transition-smooth cursor-pointer group">
-              <CardContent className="p-6 text-center">
-                <div className="bg-brand-secondary/10 rounded-full p-4 inline-block mb-4 group-hover:bg-brand-secondary/20 transition-smooth">
-                  <Briefcase className="h-8 w-8 text-brand-secondary" />
+            <Card className="hover:shadow-lg transition-all cursor-pointer group">
+              <CardHeader className="text-center">
+                <div className="bg-secondary/10 rounded-full p-4 inline-block mb-4 group-hover:bg-secondary/20 transition-colors">
+                  <Users className="h-8 w-8 text-secondary" />
                 </div>
-                <h4 className="text-xl font-bold mb-2 font-montserrat">Diretório</h4>
-                <p className="text-muted-foreground">
-                  Encontre e promova negócios liderados por mulheres em sua região.
-                </p>
-              </CardContent>
+                <CardTitle>Comunidade</CardTitle>
+                <CardDescription>
+                  Conectamos mulheres empreendedoras criando uma rede de apoio sólida.
+                </CardDescription>
+              </CardHeader>
             </Card>
 
-            <Card className="hover:shadow-brand transition-smooth cursor-pointer group">
-              <CardContent className="p-6 text-center">
-                <div className="bg-brand-tertiary/10 rounded-full p-4 inline-block mb-4 group-hover:bg-brand-tertiary/20 transition-smooth">
-                  <BookOpen className="h-8 w-8 text-brand-tertiary" />
+            <Card className="hover:shadow-lg transition-all cursor-pointer group">
+              <CardHeader className="text-center">
+                <div className="bg-accent/10 rounded-full p-4 inline-block mb-4 group-hover:bg-accent/20 transition-colors">
+                  <Target className="h-8 w-8 text-accent" />
                 </div>
-                <h4 className="text-xl font-bold mb-2 font-montserrat">Educação</h4>
-                <p className="text-muted-foreground">
-                  Acesse cursos, workshops e conteúdos exclusivos para empreendedoras.
-                </p>
-              </CardContent>
+                <CardTitle>Foco</CardTitle>
+                <CardDescription>
+                  Oferecemos direcionamento claro para alcançar objetivos empresariais.
+                </CardDescription>
+              </CardHeader>
             </Card>
 
-            <Card className="hover:shadow-brand transition-smooth cursor-pointer group">
-              <CardContent className="p-6 text-center">
-                <div className="bg-gray-medium/10 rounded-full p-4 inline-block mb-4 group-hover:bg-gray-medium/20 transition-smooth">
-                  <Heart className="h-8 w-8 text-gray-medium" />
+            <Card className="hover:shadow-lg transition-all cursor-pointer group">
+              <CardHeader className="text-center">
+                <div className="bg-primary/10 rounded-full p-4 inline-block mb-4 group-hover:bg-primary/20 transition-colors">
+                  <Award className="h-8 w-8 text-primary" />
                 </div>
-                <h4 className="text-xl font-bold mb-2 font-montserrat">Impacto Social</h4>
-                <p className="text-muted-foreground">
-                  Gere autonomia financeira e transforme comunidades através do empreendedorismo.
-                </p>
-              </CardContent>
+                <CardTitle>Excelência</CardTitle>
+                <CardDescription>
+                  Promovemos a busca contínua pela excelência em todos os projetos.
+                </CardDescription>
+              </CardHeader>
             </Card>
           </div>
         </div>
       </section>
 
-      {/* Newsletter Section */}
-      <section className="py-20 bg-brand-gradient">
+      {/* Stats Section */}
+      <section className="py-20 bg-primary text-white">
         <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto text-center text-white">
-            <Mail className="h-12 w-12 mx-auto mb-6" />
-            <h3 className="text-3xl font-bold mb-4 font-nexa">
-              Fique por Dentro das Novidades
-            </h3>
-            <p className="text-xl mb-8 text-white/90">
-              Receba conteúdos exclusivos, dicas de empreendedorismo e oportunidades de networking.
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">500+</div>
+              <div className="text-primary-foreground/80">Mulheres Conectadas</div>
+            </div>
+            <div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">50+</div>
+              <div className="text-primary-foreground/80">Projetos Realizados</div>
+            </div>
+            <div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">15+</div>
+              <div className="text-primary-foreground/80">Cidades Atingidas</div>
+            </div>
+            <div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">95%</div>
+              <div className="text-primary-foreground/80">Taxa de Satisfação</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">O que nossas participantes dizem</h2>
+            <p className="text-xl text-muted-foreground">
+              Histórias reais de transformação e crescimento
             </p>
-            <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <Input
-                type="email"
-                placeholder="Seu melhor email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="bg-white/20 border-white/30 placeholder:text-white/70 text-white"
-                required
-              />
-              <Button type="submit" className="bg-white text-brand-primary hover:bg-white/90 font-androgyne">
-                Inscrever-se
-              </Button>
-            </form>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 fill-primary text-primary" />
+                  ))}
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  "A plataforma me ajudou a conectar com outras empreendedoras e expandir meu negócio 
+                  de forma sustentável. Hoje tenho uma rede de apoio incrível!"
+                </p>
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold mr-3">
+                    M
+                  </div>
+                  <div>
+                    <div className="font-semibold">Maria Silva</div>
+                    <div className="text-sm text-muted-foreground">Fundadora da EcoBeauty</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 fill-primary text-primary" />
+                  ))}
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  "Os cursos e workshops oferecidos são de altíssima qualidade. Aprendi conceitos 
+                  fundamentais que aplicei imediatamente em minha empresa."
+                </p>
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-secondary rounded-full flex items-center justify-center text-white font-bold mr-3">
+                    A
+                  </div>
+                  <div>
+                    <div className="font-semibold">Ana Costa</div>
+                    <div className="text-sm text-muted-foreground">CEO da TechWomen</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 fill-primary text-primary" />
+                  ))}
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  "Encontrei inspiração e direcionamento para meus projetos. A comunidade é 
+                  acolhedora e sempre disposta a ajudar."
+                </p>
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center text-white font-bold mr-3">
+                    J
+                  </div>
+                  <div>
+                    <div className="font-semibold">Juliana Santos</div>
+                    <div className="text-sm text-muted-foreground">Diretora da ImpactoBr</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-foreground text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <Heart className="h-6 w-6 text-brand-primary" />
-                <span className="text-xl font-bold font-nexa">Mulheres em Convergência</span>
-              </div>
-              <p className="text-white/70 mb-4">
-                Empoderando mulheres através do empreendedorismo e da criação de redes de apoio.
-              </p>
-            </div>
-            
-            <div>
-              <h4 className="font-bold mb-4 font-montserrat">Links Rápidos</h4>
-              <ul className="space-y-2 text-white/70">
-                <li><a href="#sobre" className="hover:text-brand-primary transition-smooth">Sobre Nós</a></li>
-                <li><a href="#projetos" className="hover:text-brand-primary transition-smooth">Projetos</a></li>
-                <li><a href="#blog" className="hover:text-brand-primary transition-smooth">Blog Convergindo</a></li>
-                <li><a href="#diretorio" className="hover:text-brand-primary transition-smooth">Diretório</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-bold mb-4 font-montserrat">Comunidade</h4>
-              <ul className="space-y-2 text-white/70">
-                <li><a href="#" className="hover:text-brand-primary transition-smooth">Grupos</a></li>
-                <li><a href="#" className="hover:text-brand-primary transition-smooth">Eventos</a></li>
-                <li><a href="#" className="hover:text-brand-primary transition-smooth">Mentoria</a></li>
-                <li><a href="#" className="hover:text-brand-primary transition-smooth">Embaixadoras</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-bold mb-4 font-montserrat">Contato</h4>
-              <div className="space-y-2 text-white/70">
-                <div className="flex items-center space-x-2">
-                  <Mail className="h-4 w-4" />
-                  <span>contato@mulheresemconvergencia.com.br</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Phone className="h-4 w-4" />
-                  <span>+55 (11) 99999-9999</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <MapPin className="h-4 w-4" />
-                  <span>São Paulo, Brasil</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="border-t border-white/20 mt-8 pt-8 text-center text-white/70">
-            <p>&copy; 2024 Mulheres em Convergência. Todos os direitos reservados.</p>
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-primary to-secondary text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Pronta para transformar sua jornada empreendedora?
+          </h2>
+          <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
+            Junte-se à nossa comunidade de mulheres visionárias e comece a construir 
+            o futuro que você merece.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" className="bg-white text-primary hover:bg-white/90">
+              Comece Agora
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+              Saiba Mais
+            </Button>
           </div>
         </div>
-      </footer>
-    </div>
+      </section>
+    </Layout>
   );
 };
 

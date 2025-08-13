@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ShoppingCart, Search, Filter } from "lucide-react";
 import { useCartStore } from "@/hooks/useCartStore";
 import { Link } from "react-router-dom";
-import Navigation from "@/components/Navigation";
+import Layout from "@/components/Layout";
 
 const Shop = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -56,8 +56,7 @@ const Shop = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
+    <Layout>
       
       {/* Hero Section */}
       <section className="bg-brand-gradient py-20">
@@ -187,7 +186,7 @@ const Shop = () => {
           )}
         </div>
       </section>
-    </div>
+    </Layout>
   );
 };
 

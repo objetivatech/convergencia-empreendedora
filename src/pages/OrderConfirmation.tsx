@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Clock, Copy, ArrowLeft, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import Navigation from "@/components/Navigation";
+import Layout from "@/components/Layout";
 
 const OrderConfirmation = () => {
   const location = useLocation();
@@ -26,8 +26,7 @@ const OrderConfirmation = () => {
 
   if (!orderData) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navigation />
+      <Layout>
         <div className="container mx-auto px-4 py-20">
           <div className="text-center">
             <h1 className="text-3xl font-bold mb-4">Pedido não encontrado</h1>
@@ -41,13 +40,12 @@ const OrderConfirmation = () => {
             </Link>
           </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
+    <Layout>
       
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
@@ -202,7 +200,7 @@ const OrderConfirmation = () => {
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

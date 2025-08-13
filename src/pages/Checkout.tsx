@@ -11,7 +11,7 @@ import { CreditCard, Banknote, Building2 } from "lucide-react";
 import { useCartStore } from "@/hooks/useCartStore";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import Navigation from "@/components/Navigation";
+import Layout from "@/components/Layout";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -98,8 +98,7 @@ const Checkout = () => {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navigation />
+      <Layout>
         <div className="container mx-auto px-4 py-20">
           <div className="text-center">
             <h1 className="text-3xl font-bold mb-4">Carrinho vazio</h1>
@@ -111,13 +110,12 @@ const Checkout = () => {
             </Button>
           </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
+    <Layout>
       
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">Finalizar Compra</h1>
@@ -318,7 +316,7 @@ const Checkout = () => {
           </div>
         </form>
       </div>
-    </div>
+    </Layout>
   );
 };
 

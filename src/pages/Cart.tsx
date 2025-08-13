@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft } from "lucide-react";
 import { useCartStore } from "@/hooks/useCartStore";
-import Navigation from "@/components/Navigation";
+import { useToast } from "@/hooks/use-toast";
+import Layout from "@/components/Layout";
 
 const Cart = () => {
   const { items, removeFromCart, updateQuantity, clearCart, getTotalPrice } = useCartStore();
@@ -20,8 +21,7 @@ const Cart = () => {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navigation />
+      <Layout>
         <div className="container mx-auto px-4 py-20">
           <div className="text-center">
             <ShoppingBag className="h-24 w-24 mx-auto text-muted-foreground mb-6" />
@@ -37,14 +37,12 @@ const Cart = () => {
             </Link>
           </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      
+    <Layout>
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center gap-4 mb-8">
           <Link to="/loja">
@@ -154,7 +152,7 @@ const Cart = () => {
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
