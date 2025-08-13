@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, ShoppingCart, User, Heart } from "lucide-react";
 import { useCartStore } from "@/hooks/useCartStore";
+import logoHorizontal from "@/assets/logo-horizontal.png";
+import logoIcon from "@/assets/logo-icon.png";
 
 const Navigation = () => {
   const location = useLocation();
@@ -31,14 +33,23 @@ const Navigation = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <Heart className="h-8 w-8 text-primary" />
-            <span className="font-bold text-xl bg-brand-gradient bg-clip-text text-transparent">
-              Mulheres em Convergência
+            <img 
+              src={logoIcon} 
+              alt="Mulheres em Convergência" 
+              className="h-8 w-8"
+            />
+            <img 
+              src={logoHorizontal} 
+              alt="Mulheres em Convergência" 
+              className="h-6 hidden sm:block"
+            />
+            <span className="font-bold text-base sm:text-lg bg-brand-gradient bg-clip-text text-transparent sm:hidden">
+              MeC
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
+          <nav className="hidden lg:flex items-center space-x-4 xl:space-x-6">
             {navigationItems.map((item) => (
               <Link
                 key={item.href}
@@ -55,20 +66,20 @@ const Navigation = () => {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 md:space-x-4">
             <Link to="/cart" className="relative">
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button variant="outline" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm">
                 <ShoppingCart className="h-4 w-4" />
                 <span className="hidden sm:inline">Carrinho</span>
                 {totalItems > 0 && (
-                  <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 p-0 text-xs">
+                  <Badge variant="destructive" className="absolute -top-2 -right-2 h-4 w-4 md:h-5 md:w-5 p-0 text-xs">
                     {totalItems}
                   </Badge>
                 )}
               </Button>
             </Link>
 
-            <Button variant="outline" size="sm" className="gap-2">
+            <Button variant="outline" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm">
               <User className="h-4 w-4" />
               <span className="hidden sm:inline">Entrar</span>
             </Button>
@@ -76,7 +87,7 @@ const Navigation = () => {
             {/* Mobile menu */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="outline" size="sm" className="md:hidden">
+                <Button variant="outline" size="sm" className="lg:hidden">
                   <Menu className="h-4 w-4" />
                 </Button>
               </SheetTrigger>

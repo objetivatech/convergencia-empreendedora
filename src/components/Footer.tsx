@@ -1,5 +1,6 @@
 import { Heart, Mail, Phone, MapPin, Instagram, Facebook, Linkedin } from "lucide-react";
 import { Link } from "react-router-dom";
+import logoIcon from "@/assets/logo-icon.png";
 
 const Footer = () => {
   return (
@@ -9,7 +10,11 @@ const Footer = () => {
           {/* Logo e Descrição */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <Heart className="h-8 w-8 text-white" />
+              <img 
+                src={logoIcon} 
+                alt="Mulheres em Convergência" 
+                className="h-8 w-8"
+              />
               <span className="font-bold text-xl text-white">
                 Mulheres em Convergência
               </span>
