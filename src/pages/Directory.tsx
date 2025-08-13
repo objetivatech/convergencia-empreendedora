@@ -81,11 +81,11 @@ const Directory = () => {
       );
     }
 
-    if (selectedCategory) {
+    if (selectedCategory && selectedCategory !== "all") {
       filtered = filtered.filter(business => business.category === selectedCategory);
     }
 
-    if (selectedCity) {
+    if (selectedCity && selectedCity !== "all") {
       filtered = filtered.filter(business => business.city === selectedCity);
     }
 
@@ -196,7 +196,7 @@ const Directory = () => {
                 <SelectValue placeholder="Categoria" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas as categorias</SelectItem>
+                <SelectItem value="all">Todas as categorias</SelectItem>
                 {getUniqueCategories().map(category => (
                   <SelectItem key={category} value={category}>
                     {category}
@@ -210,7 +210,7 @@ const Directory = () => {
                 <SelectValue placeholder="Cidade" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas as cidades</SelectItem>
+                <SelectItem value="all">Todas as cidades</SelectItem>
                 {getUniqueCities().map(city => (
                   <SelectItem key={city} value={city}>
                     {city}
@@ -222,8 +222,8 @@ const Directory = () => {
             <Button 
               onClick={() => {
                 setSearchTerm("");
-                setSelectedCategory("");
-                setSelectedCity("");
+                setSelectedCategory("all");
+                setSelectedCity("all");
               }}
               variant="outline"
             >
