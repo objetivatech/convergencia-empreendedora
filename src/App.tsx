@@ -18,6 +18,7 @@ import BusinessProfile from "./pages/BusinessProfile";
 import BusinessDashboard from "./pages/BusinessDashboard";
 import AmbassadorDashboard from "./pages/AmbassadorDashboard";
 import Dashboard from "./pages/Dashboard";
+import PlanSelection from "./pages/PlanSelection";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,6 +44,11 @@ const App = () => (
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/planos" element={
+              <ProtectedRoute>
+                <PlanSelection />
               </ProtectedRoute>
             } />
             <Route path="/dashboard-negocio" element={

@@ -102,11 +102,11 @@ export default function Dashboard() {
                 <Button 
                   className="w-full" 
                   variant="outline"
-                  onClick={becomeBusinessOwner}
+                  onClick={() => navigate("/planos")}
                   disabled={loading}
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  {loading ? "Processando..." : "Cadastrar Negócio"}
+                  Cadastrar Negócio
                 </Button>
               </CardContent>
             </Card>
