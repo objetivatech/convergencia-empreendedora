@@ -14,8 +14,9 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { profile, hasRole, addRole, loading: profileLoading } = useUserRoles();
-  const { hasPendingSubscription, pendingSubscription } = useSubscription();
+  const { hasPendingSubscription, pendingSubscription, syncWithAsaas } = useSubscription();
   const [loading, setLoading] = useState(false);
+  const [syncLoading, setSyncLoading] = useState(false);
 
   const becomeAmbassador = async () => {
     if (!user || !profile) return;
@@ -44,6 +45,22 @@ export default function Dashboard() {
       toast.error("Erro ao se tornar dono de negócio. Tente novamente.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSyncSubscriptions = async () => {
+    setSyncLoading(true);
+    try {
+      const result = await syncWithAsaas();
+      if (result.success) {
+        toast.success(`Sincronização concluída: ${result.deleted || 0} assinaturas inválidas removidas`);
+      } else {
+        toast.error(`Erro na sincronização: ${result.error}`);
+      }
+    } catch (error) {
+      toast.error("Erro ao sincronizar com ASAAS");
+    } finally {
+      setSyncLoading(false);
     }
   };
 
@@ -85,10 +102,18 @@ export default function Dashboard() {
               </p>
               <Button 
                 variant="outline" 
-                className="border-orange-300 text-orange-700 hover:bg-orange-100"
+                className="border-orange-300 text-orange-700 hover:bg-orange-100 mr-2"
                 onClick={() => toast.info("Verifique seu email para o link de pagamento ou entre em contato com o suporte.")}
               >
                 Como completar o pagamento?
+              </Button>
+              <Button 
+                variant="outline" 
+                className="border-orange-300 text-orange-700 hover:bg-orange-100"
+                onClick={handleSyncSubscriptions}
+                disabled={syncLoading}
+              >
+                {syncLoading ? "Sincronizando..." : "Verificar Status no ASAAS"}
               </Button>
             </CardContent>
           </Card>

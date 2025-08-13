@@ -118,6 +118,27 @@ export const useSubscription = () => {
     }
   };
 
+  const syncWithAsaas = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase.functions.invoke('sync-subscription-status');
+      
+      if (error) {
+        console.error('Error syncing with ASAAS:', error);
+        return { success: false, error: error.message };
+      }
+
+      // Refresh local data after sync
+      await checkSubscription();
+      
+      return { success: true, ...data };
+    } catch (error) {
+      console.error('Error in syncWithAsaas:', error);
+      return { success: false, error: 'Failed to sync with ASAAS' };
+    }
+  };
+
   return {
     subscription,
     pendingSubscription,
@@ -125,5 +146,6 @@ export const useSubscription = () => {
     hasActiveSubscription: hasActiveSubscription(),
     hasPendingSubscription: hasPendingSubscription(),
     refreshSubscription,
+    syncWithAsaas,
   };
 };
