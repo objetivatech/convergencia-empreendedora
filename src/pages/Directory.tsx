@@ -10,6 +10,8 @@ import { Search, MapPin, Phone, Mail, Globe, Instagram, MessageCircle, Eye, Mous
 import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import LocationSearch from "@/components/LocationSearch";
+import AdvancedFiltersPanel from "@/components/AdvancedFiltersPanel";
+import BusinessHoursDisplay from "@/components/BusinessHoursDisplay";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Business {
@@ -49,6 +51,20 @@ const Directory = () => {
   const [searchRadius, setSearchRadius] = useState([10]); // km
   const [useLocationFilter, setUseLocationFilter] = useState(false);
   const [loading, setLoading] = useState(true);
+  
+  // Advanced filters state
+  const [advancedFilters, setAdvancedFilters] = useState({
+    categories: [] as string[],
+    cities: [] as string[],
+    rating: [0],
+    priceRange: 'all',
+    features: [] as string[],
+    openNow: false,
+    verified: false,
+    distance: [10],
+    sortBy: 'relevance',
+    searchTags: [] as string[]
+  });
 
   useEffect(() => {
     fetchBusinesses();

@@ -3,7 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, ShoppingCart, User, Heart } from "lucide-react";
+import { Menu, ShoppingCart, User, Heart, Building2, MapPin } from "lucide-react";
+import NotificationCenter from "./NotificationCenter";
 import { useCartStore } from "@/hooks/useCartStore";
 
 const Navigation = () => {
@@ -21,7 +22,8 @@ const Navigation = () => {
     { href: "/sobre", label: "Sobre" },
     { href: "/projetos", label: "Projetos" },
     { href: "/loja", label: "Loja" },
-    { href: "/diretorios", label: "Diretórios" },
+    { href: "/diretorio", label: "Diretório" },
+    { href: "/dashboard-negocio", label: "Meu Negócio" },
     { href: "/comunidade", label: "Comunidade" },
   ];
 
@@ -68,6 +70,8 @@ const Navigation = () => {
                 )}
               </Button>
             </Link>
+
+            <NotificationCenter />
 
             <Button variant="outline" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm">
               <User className="h-4 w-4" />

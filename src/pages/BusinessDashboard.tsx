@@ -29,6 +29,8 @@ import {
 import Layout from "@/components/Layout";
 import LocationSearch from "@/components/LocationSearch";
 import ImageUpload from "@/components/ImageUpload";
+import BusinessHoursManager from "@/components/BusinessHoursManager";
+import PlanSelector from "@/components/PlanSelector";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -534,6 +536,12 @@ const BusinessDashboard = () => {
                     </div>
                   </CardContent>
                 </Card>
+
+                {/* Business Hours Management */}
+                <BusinessHoursManager
+                  value={formData.opening_hours || {}}
+                  onChange={(hours) => updateFormData('opening_hours', hours)}
+                />
               </div>
 
               {/* Preview */}
@@ -704,6 +712,17 @@ const BusinessDashboard = () => {
                 )}
               </CardContent>
             </Card>
+            
+            <PlanSelector 
+              currentPlan={business?.subscription_plan}
+              onPlanSelect={(planId) => {
+                toast({
+                  title: "Upgrade de Plano",
+                  description: "Funcionalidade de pagamento em desenvolvimento",
+                });
+              }}
+              businessId={business?.id}
+            />
           </TabsContent>
         </Tabs>
       </div>

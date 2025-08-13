@@ -21,6 +21,7 @@ import {
 import Layout from "@/components/Layout";
 import BusinessMap from "@/components/BusinessMap";
 import BusinessReviews from "@/components/BusinessReviews";
+import BusinessHoursDisplay from "@/components/BusinessHoursDisplay";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Business {
@@ -348,19 +349,9 @@ const BusinessProfile = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Opening Hours */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Clock className="h-5 w-5 mr-2" />
-                  Horário de Funcionamento
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {formatOpeningHours(business.opening_hours)}
-                </div>
-              </CardContent>
-            </Card>
+            <BusinessHoursDisplay 
+              openingHours={business.opening_hours || {}}
+            />
 
             {/* Business Stats */}
             <Card>
