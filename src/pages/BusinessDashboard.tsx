@@ -30,11 +30,25 @@ import Layout from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
+type BusinessCategory = 
+  | 'alimentacao'
+  | 'moda' 
+  | 'beleza'
+  | 'servicos'
+  | 'tecnologia'
+  | 'educacao'
+  | 'saude'
+  | 'consultoria'
+  | 'artesanato'
+  | 'eventos'
+  | 'marketing'
+  | 'outros';
+
 interface Business {
   id: string;
   name: string;
   description: string;
-  category: string;
+  category: BusinessCategory;
   subcategory: string;
   phone: string;
   email: string;
@@ -129,15 +143,36 @@ const BusinessDashboard = () => {
           description: "Negócio atualizado com sucesso!",
         });
       } else {
-        // Create new business
+        // Create new business - ensure required fields are present
+        if (!formData.name || !formData.category) {
+          throw new Error("Nome e categoria são obrigatórios");
+        }
+        
+        const businessData = {
+          name: formData.name!,
+          category: formData.category!,
+          description: formData.description,
+          subcategory: formData.subcategory,
+          phone: formData.phone,
+          email: formData.email,
+          website: formData.website,
+          instagram: formData.instagram,
+          whatsapp: formData.whatsapp,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          postal_code: formData.postal_code,
+          logo_url: formData.logo_url,
+          cover_image_url: formData.cover_image_url,
+          gallery_images: formData.gallery_images,
+          owner_id: user.id,
+          subscription_active: true,
+          subscription_plan: 'basic'
+        };
+
         const { error } = await supabase
           .from('businesses')
-          .insert([{
-            ...formData,
-            owner_id: user.id,
-            subscription_active: true,
-            subscription_plan: 'basic'
-          }]);
+          .insert([businessData]);
 
         if (error) throw error;
         
@@ -177,17 +212,19 @@ const BusinessDashboard = () => {
     updateFormData('gallery_images', currentImages.filter((_, i) => i !== index));
   };
 
-  const categories = [
-    'Alimentação',
-    'Beleza e Estética',
-    'Educação',
-    'Saúde e Bem-estar',
-    'Moda e Acessórios',
-    'Casa e Decoração',
-    'Tecnologia',
-    'Serviços',
-    'Arte e Artesanato',
-    'Consultoria'
+  const categories: { value: BusinessCategory; label: string }[] = [
+    { value: 'alimentacao', label: 'Alimentação' },
+    { value: 'beleza', label: 'Beleza e Estética' },
+    { value: 'educacao', label: 'Educação' },
+    { value: 'saude', label: 'Saúde e Bem-estar' },
+    { value: 'moda', label: 'Moda e Acessórios' },
+    { value: 'outros', label: 'Casa e Decoração' },
+    { value: 'tecnologia', label: 'Tecnologia' },
+    { value: 'servicos', label: 'Serviços' },
+    { value: 'artesanato', label: 'Arte e Artesanato' },
+    { value: 'consultoria', label: 'Consultoria' },
+    { value: 'eventos', label: 'Eventos' },
+    { value: 'marketing', label: 'Marketing' }
   ];
 
   if (loading) {
@@ -261,8 +298,8 @@ const BusinessDashboard = () => {
                           </SelectTrigger>
                           <SelectContent>
                             {categories.map(category => (
-                              <SelectItem key={category} value={category}>
-                                {category}
+                              <SelectItem key={category.value} value={category.value}>
+                                {category.label}
                               </SelectItem>
                             ))}
                           </SelectContent>

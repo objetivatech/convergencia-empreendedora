@@ -84,7 +84,12 @@ const BusinessProfile = () => {
 
   const updateViewCount = async () => {
     try {
-      await supabase.rpc('increment_business_views', { business_id: id });
+      if (business) {
+        await supabase
+          .from('businesses')
+          .update({ views_count: business.views_count + 1 })
+          .eq('id', id);
+      }
     } catch (error) {
       console.error('Erro ao atualizar visualizações:', error);
     }
@@ -92,10 +97,18 @@ const BusinessProfile = () => {
 
   const updateContactMetrics = async (metricType: 'click' | 'contact') => {
     try {
-      if (metricType === 'click') {
-        await supabase.rpc('increment_business_clicks', { business_id: id });
-      } else {
-        await supabase.rpc('increment_business_contacts', { business_id: id });
+      if (business) {
+        if (metricType === 'click') {
+          await supabase
+            .from('businesses')
+            .update({ clicks_count: business.clicks_count + 1 })
+            .eq('id', id);
+        } else {
+          await supabase
+            .from('businesses')
+            .update({ contacts_count: business.contacts_count + 1 })
+            .eq('id', id);
+        }
       }
     } catch (error) {
       console.error('Erro ao atualizar métricas:', error);
