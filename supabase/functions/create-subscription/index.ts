@@ -197,6 +197,48 @@ serve(async (req) => {
       status: subscriptionResult.status 
     });
 
+    // Como assinaturas não geram links de pagamento automaticamente,
+    // vamos criar uma cobrança inicial para gerar o link de pagamento
+    let paymentUrl = subscriptionResult.invoiceUrl;
+    
+    if (!paymentUrl) {
+      logStep("No invoiceUrl found, creating initial payment");
+      
+      const createPaymentUrl = "https://www.asaas.com/api/v3/payments";
+      const paymentData = {
+        customer: customerId,
+        billingType: "CREDIT_CARD",
+        value: value,
+        dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Amanhã
+        description: `${description} - Primeira cobrança`,
+        externalReference: subscriptionResult.id, // Referência à assinatura
+      };
+
+      logStep("Creating initial payment", paymentData);
+
+      const paymentResponse = await fetch(createPaymentUrl, {
+        method: "POST",
+        headers: {
+          "access_token": asaasApiKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(paymentData),
+      });
+
+      const paymentResult = await paymentResponse.json();
+      
+      if (!paymentResponse.ok) {
+        logStep("ASAAS payment creation failed", paymentResult);
+        throw new Error(`Failed to create payment: ${paymentResult.errors?.[0]?.description || 'Unknown error'}`);
+      }
+
+      paymentUrl = paymentResult.invoiceUrl;
+      logStep("Initial payment created", { 
+        paymentId: paymentResult.id,
+        invoiceUrl: paymentResult.invoiceUrl 
+      });
+    }
+
     // Salvar assinatura no banco de dados (na tabela de assinaturas de usuário)
     const { error: insertError } = await supabaseService
       .from('user_subscriptions')
@@ -234,18 +276,14 @@ serve(async (req) => {
       logStep("Business owner role added successfully");
     }
 
-    // Retornar URL de pagamento (invoiceUrl do ASAAS)
-    logStep("Subscription response from ASAAS", {
-      id: subscriptionResult.id,
-      status: subscriptionResult.status,
-      invoiceUrl: subscriptionResult.invoiceUrl,
-      hasInvoiceUrl: !!subscriptionResult.invoiceUrl
-    });
+    if (!paymentUrl) {
+      throw new Error("Failed to generate payment URL");
+    }
 
     return new Response(JSON.stringify({
       success: true,
       subscriptionId: subscriptionResult.id,
-      paymentUrl: subscriptionResult.invoiceUrl || `https://www.asaas.com/c/${subscriptionResult.id}`,
+      paymentUrl: paymentUrl,
       status: subscriptionResult.status
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
