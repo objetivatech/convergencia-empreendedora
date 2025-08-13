@@ -3,14 +3,16 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, ShoppingCart, User, Heart, Building2, MapPin } from "lucide-react";
+import { Menu, ShoppingCart, User, Heart, Building2, MapPin, LogOut } from "lucide-react";
 import NotificationCenter from "./NotificationCenter";
 import { useCartStore } from "@/hooks/useCartStore";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navigation = () => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const { getTotalItems } = useCartStore();
+  const { user, signOut } = useAuth();
   const totalItems = getTotalItems();
 
   const isActive = (path: string) => {
@@ -73,10 +75,32 @@ const Navigation = () => {
 
             <NotificationCenter />
 
-            <Button variant="outline" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm">
-              <User className="h-4 w-4" />
-              <span className="hidden sm:inline">Entrar</span>
-            </Button>
+            {user ? (
+              <div className="flex items-center space-x-2">
+                <Link to="/dashboard">
+                  <Button variant="outline" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm">
+                    <User className="h-4 w-4" />
+                    <span className="hidden sm:inline">Dashboard</span>
+                  </Button>
+                </Link>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={signOut}
+                  className="gap-1 md:gap-2 text-xs md:text-sm"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden sm:inline">Sair</span>
+                </Button>
+              </div>
+            ) : (
+              <Link to="/auth">
+                <Button variant="outline" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm">
+                  <User className="h-4 w-4" />
+                  <span className="hidden sm:inline">Entrar</span>
+                </Button>
+              </Link>
+            )}
 
             {/* Mobile menu */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>

@@ -345,6 +345,7 @@ export type Database = {
           phone: string | null
           plan_features: Json | null
           postal_code: string | null
+          requires_subscription: boolean | null
           state: string | null
           subcategory: string | null
           subscription_active: boolean | null
@@ -378,6 +379,7 @@ export type Database = {
           phone?: string | null
           plan_features?: Json | null
           postal_code?: string | null
+          requires_subscription?: boolean | null
           state?: string | null
           subcategory?: string | null
           subscription_active?: boolean | null
@@ -411,6 +413,7 @@ export type Database = {
           phone?: string | null
           plan_features?: Json | null
           postal_code?: string | null
+          requires_subscription?: boolean | null
           state?: string | null
           subcategory?: string | null
           subscription_active?: boolean | null
@@ -679,14 +682,18 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
+          can_edit_blog: boolean | null
           city: string | null
           country: string | null
           created_at: string | null
           email: string
           full_name: string | null
           id: string
+          is_admin: boolean | null
           newsletter_subscribed: boolean | null
+          onboarding_completed: boolean | null
           phone: string | null
+          roles: Database["public"]["Enums"]["user_role"][] | null
           state: string | null
           subscription_types:
             | Database["public"]["Enums"]["subscription_type"][]
@@ -697,14 +704,18 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          can_edit_blog?: boolean | null
           city?: string | null
           country?: string | null
           created_at?: string | null
           email: string
           full_name?: string | null
           id: string
+          is_admin?: boolean | null
           newsletter_subscribed?: boolean | null
+          onboarding_completed?: boolean | null
           phone?: string | null
+          roles?: Database["public"]["Enums"]["user_role"][] | null
           state?: string | null
           subscription_types?:
             | Database["public"]["Enums"]["subscription_type"][]
@@ -715,14 +726,18 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          can_edit_blog?: boolean | null
           city?: string | null
           country?: string | null
           created_at?: string | null
           email?: string
           full_name?: string | null
           id?: string
+          is_admin?: boolean | null
           newsletter_subscribed?: boolean | null
+          onboarding_completed?: boolean | null
           phone?: string | null
+          roles?: Database["public"]["Enums"]["user_role"][] | null
           state?: string | null
           subscription_types?:
             | Database["public"]["Enums"]["subscription_type"][]
@@ -893,11 +908,63 @@ export type Database = {
           },
         ]
       }
+      user_permissions: {
+        Row: {
+          active: boolean | null
+          expires_at: string | null
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          permission_name: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean | null
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          permission_name: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean | null
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          permission_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_permissions_granted_by_fkey"
+            columns: ["granted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_permissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      add_user_role: {
+        Args: {
+          user_uuid: string
+          new_role: Database["public"]["Enums"]["user_role"]
+        }
+        Returns: undefined
+      }
       calculate_business_rating: {
         Args: { business_uuid: string }
         Returns: {
@@ -930,9 +997,27 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      remove_user_role: {
+        Args: {
+          user_uuid: string
+          old_role: Database["public"]["Enums"]["user_role"]
+        }
+        Returns: undefined
+      }
       track_referral_click: {
         Args: { referral_code: string }
         Returns: undefined
+      }
+      user_has_permission: {
+        Args: { user_uuid: string; permission_name: string }
+        Returns: boolean
+      }
+      user_has_role: {
+        Args: {
+          user_uuid: string
+          role_name: Database["public"]["Enums"]["user_role"]
+        }
+        Returns: boolean
       }
     }
     Enums: {
@@ -957,6 +1042,13 @@ export type Database = {
         | "business_premium"
       transaction_status: "pending" | "completed" | "cancelled" | "refunded"
       transaction_type: "product" | "subscription" | "donation"
+      user_role:
+        | "admin"
+        | "business_owner"
+        | "ambassador"
+        | "community_member"
+        | "blog_editor"
+        | "customer"
       user_type:
         | "admin"
         | "member"
@@ -1113,6 +1205,14 @@ export const Constants = {
       ],
       transaction_status: ["pending", "completed", "cancelled", "refunded"],
       transaction_type: ["product", "subscription", "donation"],
+      user_role: [
+        "admin",
+        "business_owner",
+        "ambassador",
+        "community_member",
+        "blog_editor",
+        "customer",
+      ],
       user_type: [
         "admin",
         "member",
