@@ -8,15 +8,12 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo e Descrição */}
           <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center space-x-2 mb-4">
+            <div className="mb-4">
               <img 
-                src="/lovable-uploads/a432da4b-dfdd-49ab-89f0-20ea69b4e4d7.png" 
+                src="/lovable-uploads/cae4c859-e76c-4a0a-ae39-475f08b8afec.png" 
                 alt="Mulheres em Convergência" 
-                className="h-8 w-8 brightness-0 invert"
+                className="h-8"
               />
-              <span className="font-bold text-xl text-white">
-                Mulheres em Convergência
-              </span>
             </div>
             <p className="text-white/80 mb-4 max-w-md">
               Uma plataforma dedicada ao empoderamento feminino, oferecendo recursos, 

@@ -30,20 +30,12 @@ const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center">
             <img 
-              src="/lovable-uploads/5eba316e-250b-4229-91de-5bccaefa8515.png" 
+              src="/lovable-uploads/07fc5569-e601-40a0-85f0-0521b206817f.png" 
               alt="Mulheres em Convergência" 
-              className="h-8 w-8"
+              className="h-8"
             />
-            <img 
-              src="/lovable-uploads/3b711630-8458-4762-a6b3-8ae0311681f8.png" 
-              alt="Mulheres em Convergência" 
-              className="h-6 hidden sm:block"
-            />
-            <span className="font-bold text-base sm:text-lg bg-brand-gradient bg-clip-text text-transparent sm:hidden">
-              MeC
-            </span>
           </Link>
 
           {/* Desktop Navigation */}
