@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import Layout from "@/components/Layout";
 import LocationSearch from "@/components/LocationSearch";
+import ImageUpload from "@/components/ImageUpload";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -461,54 +462,75 @@ const BusinessDashboard = () => {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Imagens</CardTitle>
+                    <CardTitle>Imagens do Negócio</CardTitle>
+                    <CardDescription>
+                      Faça upload de imagens profissionais para destacar seu negócio
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <Label htmlFor="logo_url">Logo (URL)</Label>
-                      <Input
-                        id="logo_url"
-                        value={formData.logo_url || ''}
-                        onChange={(e) => updateFormData('logo_url', e.target.value)}
-                        placeholder="https://..."
+                  <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <ImageUpload
+                        bucket="business-logos"
+                        currentImageUrl={formData.logo_url}
+                        onImageUploaded={(url) => updateFormData('logo_url', url)}
+                        onImageRemoved={() => updateFormData('logo_url', '')}
+                        label="Logo do Negócio"
+                        maxSize={2}
+                      />
+                      
+                      <ImageUpload
+                        bucket="business-covers"
+                        currentImageUrl={formData.cover_image_url}
+                        onImageUploaded={(url) => updateFormData('cover_image_url', url)}
+                        onImageRemoved={() => updateFormData('cover_image_url', '')}
+                        label="Imagem de Capa"
+                        maxSize={5}
                       />
                     </div>
 
                     <div>
-                      <Label htmlFor="cover_image_url">Imagem de Capa (URL)</Label>
-                      <Input
-                        id="cover_image_url"
-                        value={formData.cover_image_url || ''}
-                        onChange={(e) => updateFormData('cover_image_url', e.target.value)}
-                        placeholder="https://..."
-                      />
-                    </div>
-
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <Label>Galeria de Imagens</Label>
-                        <Button type="button" size="sm" onClick={addGalleryImage}>
-                          <Plus className="h-4 w-4 mr-1" />
-                          Adicionar
-                        </Button>
-                      </div>
-                      {formData.gallery_images && formData.gallery_images.length > 0 && (
-                        <div className="space-y-2">
-                          {formData.gallery_images.map((url, index) => (
-                            <div key={index} className="flex items-center gap-2">
-                              <Input value={url} readOnly />
-                              <Button
-                                type="button"
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => removeGalleryImage(index)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          ))}
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <Label>Galeria de Imagens</Label>
+                          <p className="text-sm text-muted-foreground">
+                            Adicione até 6 imagens para mostrar seus produtos/serviços
+                          </p>
                         </div>
-                      )}
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {formData.gallery_images?.slice(0, 6).map((url, index) => (
+                          <div key={index} className="relative group">
+                            <img 
+                              src={url} 
+                              alt={`Galeria ${index + 1}`}
+                              className="w-full h-32 object-cover rounded-lg border"
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={() => removeGalleryImage(index)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                        
+                        {(!formData.gallery_images || formData.gallery_images.length < 6) && (
+                          <ImageUpload
+                            bucket="business-gallery"
+                            onImageUploaded={(url) => {
+                              const currentImages = formData.gallery_images || [];
+                              updateFormData('gallery_images', [...currentImages, url]);
+                            }}
+                            label=""
+                            maxSize={3}
+                            className="h-32"
+                          />
+                        )}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
