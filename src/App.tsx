@@ -14,6 +14,7 @@ import Directory from "./pages/Directory";
 import BusinessProfile from "./pages/BusinessProfile";
 import BusinessDashboard from "./pages/BusinessDashboard";
 import AmbassadorDashboard from "./pages/AmbassadorDashboard";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/pedido-confirmado" element={<OrderConfirmation />} />
           <Route path="/diretorio" element={<Directory />} />
           <Route path="/diretorio/:id" element={<BusinessProfile />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard-negocio" element={<BusinessDashboard />} />
           <Route path="/dashboard-embaixadora" element={<AmbassadorDashboard />} />
           {/* Legacy routes */}
