@@ -20,6 +20,7 @@ interface UserSubscription {
 export const useSubscription = () => {
   const { user } = useAuth();
   const [subscription, setSubscription] = useState<UserSubscription | null>(null);
+  const [pendingSubscription, setPendingSubscription] = useState<UserSubscription | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,6 +28,7 @@ export const useSubscription = () => {
       checkSubscription();
     } else {
       setSubscription(null);
+      setPendingSubscription(null);
       setLoading(false);
     }
   }, [user]);
@@ -35,7 +37,8 @@ export const useSubscription = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      // Check for active subscription
+      const { data: activeData, error: activeError } = await supabase
         .from('user_subscriptions')
         .select(`
           *,
@@ -51,15 +54,40 @@ export const useSubscription = () => {
         .limit(1)
         .maybeSingle();
 
-      if (error) {
-        console.error('Error checking subscription:', error);
+      // Check for pending subscription
+      const { data: pendingData, error: pendingError } = await supabase
+        .from('user_subscriptions')
+        .select(`
+          *,
+          subscription_plans (
+            name,
+            display_name,
+            features
+          )
+        `)
+        .eq('user_id', user.id)
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (activeError) {
+        console.error('Error checking active subscription:', activeError);
         setSubscription(null);
       } else {
-        setSubscription(data);
+        setSubscription(activeData);
+      }
+
+      if (pendingError) {
+        console.error('Error checking pending subscription:', pendingError);
+        setPendingSubscription(null);
+      } else {
+        setPendingSubscription(pendingData);
       }
     } catch (error) {
       console.error('Error in checkSubscription:', error);
       setSubscription(null);
+      setPendingSubscription(null);
     } finally {
       setLoading(false);
     }
@@ -80,6 +108,10 @@ export const useSubscription = () => {
     return true;
   };
 
+  const hasPendingSubscription = () => {
+    return !!pendingSubscription;
+  };
+
   const refreshSubscription = () => {
     if (user) {
       checkSubscription();
@@ -88,8 +120,10 @@ export const useSubscription = () => {
 
   return {
     subscription,
+    pendingSubscription,
     loading,
     hasActiveSubscription: hasActiveSubscription(),
+    hasPendingSubscription: hasPendingSubscription(),
     refreshSubscription,
   };
 };

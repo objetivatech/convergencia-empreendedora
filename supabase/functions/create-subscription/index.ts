@@ -205,14 +205,19 @@ serve(async (req) => {
       logStep("No invoiceUrl found, creating initial payment");
       
       const createPaymentUrl = "https://www.asaas.com/api/v3/payments";
-      const paymentData = {
+      const paymentData: any = {
         customer: customerId,
-        billingType: "CREDIT_CARD",
+        billingType: paymentMethod || "CREDIT_CARD",
         value: value,
         dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Amanhã
         description: `${description} - Primeira cobrança`,
         externalReference: subscriptionResult.id, // Referência à assinatura
       };
+
+      // Para PIX, definir configurações específicas
+      if (paymentMethod === "PIX") {
+        paymentData.pixAddressKey = null; // Usar chave padrão do ASAAS
+      }
 
       logStep("Creating initial payment", paymentData);
 
@@ -235,7 +240,9 @@ serve(async (req) => {
       paymentUrl = paymentResult.invoiceUrl;
       logStep("Initial payment created", { 
         paymentId: paymentResult.id,
-        invoiceUrl: paymentResult.invoiceUrl 
+        invoiceUrl: paymentResult.invoiceUrl,
+        pixQrCode: paymentResult.encodedImage,
+        pixCopyAndPaste: paymentResult.payload
       });
     }
 

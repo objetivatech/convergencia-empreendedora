@@ -5,14 +5,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRoles } from "@/hooks/useUserRoles";
+import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
-import { Building2, Users, ShoppingCart, TrendingUp, Crown, Plus } from "lucide-react";
+import { Building2, Users, ShoppingCart, TrendingUp, Crown, Plus, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { profile, hasRole, addRole, loading: profileLoading } = useUserRoles();
+  const { hasPendingSubscription, pendingSubscription } = useSubscription();
   const [loading, setLoading] = useState(false);
 
   const becomeAmbassador = async () => {
@@ -65,6 +67,33 @@ export default function Dashboard() {
           </p>
         </div>
 
+        {/* Pending Subscription Alert */}
+        {hasPendingSubscription && (
+          <Card className="mb-6 border-orange-200 bg-orange-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-orange-700">
+                <AlertTriangle className="h-5 w-5" />
+                Assinatura Pendente
+              </CardTitle>
+              <CardDescription className="text-orange-600">
+                Você tem uma assinatura do plano "{pendingSubscription?.subscription_plans?.display_name}" aguardando pagamento.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-orange-600 mb-4">
+                Complete o pagamento para acessar o dashboard do negócio e todas as funcionalidades do plano.
+              </p>
+              <Button 
+                variant="outline" 
+                className="border-orange-300 text-orange-700 hover:bg-orange-100"
+                onClick={() => toast.info("Verifique seu email para o link de pagamento ou entre em contato com o suporte.")}
+              >
+                Como completar o pagamento?
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Business Dashboard */}
           {hasRole('business_owner') ? (
@@ -103,11 +132,16 @@ export default function Dashboard() {
                   className="w-full" 
                   variant="outline"
                   onClick={() => navigate("/planos")}
-                  disabled={loading}
+                  disabled={loading || hasPendingSubscription}
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Cadastrar Negócio
+                  {hasPendingSubscription ? "Pagamento Pendente" : "Cadastrar Negócio"}
                 </Button>
+                {hasPendingSubscription && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Complete o pagamento da assinatura pendente antes de criar uma nova.
+                  </p>
+                )}
               </CardContent>
             </Card>
           )}
