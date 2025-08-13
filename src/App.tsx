@@ -10,6 +10,9 @@ import Shop from "./pages/Shop";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
+import Directory from "./pages/Directory";
+import BusinessProfile from "./pages/BusinessProfile";
+import BusinessDashboard from "./pages/BusinessDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +31,9 @@ const App = () => (
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/pedido-confirmado" element={<OrderConfirmation />} />
+          <Route path="/diretorio" element={<Directory />} />
+          <Route path="/diretorio/:id" element={<BusinessProfile />} />
+          <Route path="/dashboard-negocio" element={<BusinessDashboard />} />
           {/* Legacy routes */}
           <Route path="/about" element={<About />} />
           <Route path="/projects" element={<Projects />} />
