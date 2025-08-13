@@ -224,7 +224,7 @@ const Directory = () => {
       <Layout>
         <div className="container mx-auto section-padding">
           <div className="text-center">
-            <h1 className="font-bold mb-4">Carregando diretório...</h1>
+            <h1 className="font-bold mb-4">Carregando convergentes...</h1>
           </div>
         </div>
       </Layout>
@@ -236,7 +236,7 @@ const Directory = () => {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-primary to-secondary text-white section-padding">
         <div className="container mx-auto text-center">
-          <h1 className="font-bold mb-4">Diretório de Negócios</h1>
+          <h1 className="font-bold mb-4">Convergentes</h1>
           <p className="text-lg md:text-xl mb-8 text-white/90 max-w-2xl mx-auto">
             Descubra negócios incríveis de mulheres empreendedoras em todo o Brasil
           </p>
