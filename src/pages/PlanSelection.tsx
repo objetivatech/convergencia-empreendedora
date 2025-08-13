@@ -126,23 +126,44 @@ export default function PlanSelection() {
 
   const handlePlanSelect = async (planId: string, billingCycle: 'monthly' | 'yearly' | 'semestral') => {
     try {
-      // Por enquanto, mostrar mensagem de sucesso e redirecionar para dashboard de negócios
       toast({
-        title: "Plano Selecionado!",
-        description: "Redirecionando para configuração do seu negócio...",
+        title: "Processando...",
+        description: "Criando sua assinatura...",
       });
-      
-      // Em uma implementação real, aqui seria integrado com ASAAS
-      // Para este exemplo, vamos direcionar para o dashboard de negócios
-      setTimeout(() => {
-        navigate('/dashboard-negocio');
-      }, 1500);
+
+      const { data, error } = await supabase.functions.invoke('create-subscription', {
+        body: {
+          planId,
+          billingCycle
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.success && data.paymentUrl) {
+        toast({
+          title: "Assinatura Criada!",
+          description: "Redirecionando para o pagamento...",
+        });
+        
+        // Abrir URL de pagamento em nova aba
+        window.open(data.paymentUrl, '_blank');
+        
+        // Redirecionar para dashboard após um tempo
+        setTimeout(() => {
+          navigate('/dashboard-negocio');
+        }, 2000);
+      } else {
+        throw new Error(data.error || 'Erro ao criar assinatura');
+      }
       
     } catch (error) {
       console.error('Error selecting plan:', error);
       toast({
         title: "Erro",
-        description: "Não foi possível selecionar o plano. Tente novamente.",
+        description: error.message || "Não foi possível criar a assinatura. Tente novamente.",
         variant: "destructive",
       });
     }
