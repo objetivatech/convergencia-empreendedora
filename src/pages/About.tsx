@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Heart, Users, Target, Award, ArrowRight, CheckCircle } from "lucide-react";
 import Layout from "@/components/Layout";
+import { HistoryTimeline } from "@/components/HistoryTimeline";
 
 const About = () => {
   return (
@@ -51,6 +52,9 @@ const About = () => {
           </div>
         </div>
       </section>
+
+      {/* Timeline */}
+      <HistoryTimeline />
 
       {/* Missão, Visão e Valores */}
       <section className="py-20 bg-muted/50">
