@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Heart, Users, Target, Award, ArrowRight, CheckCircle } from "lucide-react";
 import Layout from "@/components/Layout";
-import { HistoryTimeline } from "@/components/HistoryTimeline";
+import { HistoryTimelineCarousel } from "@/components/HistoryTimelineCarousel";
 
 const About = () => {
   return (
@@ -54,7 +54,7 @@ const About = () => {
       </section>
 
       {/* Timeline */}
-      <HistoryTimeline />
+      <HistoryTimelineCarousel />
 
       {/* Missão, Visão e Valores */}
       <section className="py-20 bg-muted/50">
