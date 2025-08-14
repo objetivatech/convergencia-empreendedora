@@ -286,7 +286,14 @@ serve(async (req) => {
     });
 
     const paymentResult = await paymentResponse.json();
+    logStep("ASAAS payment response", { status: paymentResponse.status, result: paymentResult });
+    
     if (!paymentResponse.ok) {
+      logStep("ASAAS payment error", { 
+        status: paymentResponse.status, 
+        statusText: paymentResponse.statusText,
+        error: paymentResult 
+      });
       throw new Error(`Failed to create payment: ${JSON.stringify(paymentResult)}`);
     }
 
@@ -399,12 +406,19 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    logStep("Error in create-payment function", error);
+    logStep("Error in create-payment function", { 
+      message: error.message, 
+      stack: error.stack,
+      timestamp: new Date().toISOString()
+    });
+    
+    console.error('Error in create-payment function:', error);
     
     return new Response(
       JSON.stringify({ 
         success: false,
-        error: error.message || 'Internal server error' 
+        error: error.message || 'Internal server error',
+        timestamp: new Date().toISOString()
       }),
       {
         status: 500,
