@@ -3,16 +3,18 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, ShoppingCart, User, Heart, Building2, MapPin, LogOut } from "lucide-react";
+import { Menu, ShoppingCart, User, Heart, Building2, MapPin, LogOut, Settings } from "lucide-react";
 import NotificationCenter from "./NotificationCenter";
 import { useCartStore } from "@/hooks/useCartStore";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRoles } from "@/hooks/useUserRoles";
 
 const Navigation = () => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const { getTotalItems } = useCartStore();
   const { user, signOut } = useAuth();
+  const { isAdmin } = useUserRoles();
   const totalItems = getTotalItems();
 
   const isActive = (path: string) => {
@@ -83,6 +85,14 @@ const Navigation = () => {
                     <span className="hidden sm:inline">Dashboard</span>
                   </Button>
                 </Link>
+                {isAdmin() && (
+                  <Link to="/admin">
+                    <Button variant="outline" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm border-primary/20 hover:bg-primary/10">
+                      <Settings className="h-4 w-4" />
+                      <span className="hidden sm:inline">Admin</span>
+                    </Button>
+                  </Link>
+                )}
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -125,6 +135,19 @@ const Navigation = () => {
                       {item.label}
                     </Link>
                   ))}
+                  
+                  {user && isAdmin() && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setIsOpen(false)}
+                      className="text-sm font-medium transition-colors hover:text-primary px-4 py-2 rounded-md text-muted-foreground border-t border-border pt-4"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Settings className="h-4 w-4" />
+                        Painel Administrativo
+                      </div>
+                    </Link>
+                  )}
                 </div>
               </SheetContent>
             </Sheet>
