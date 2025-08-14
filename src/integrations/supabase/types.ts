@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
@@ -1013,8 +1013,8 @@ export type Database = {
     Functions: {
       add_user_role: {
         Args: {
-          user_uuid: string
           new_role: Database["public"]["Enums"]["user_role"]
+          user_uuid: string
         }
         Returns: undefined
       }
@@ -1022,28 +1022,28 @@ export type Database = {
         Args: { business_uuid: string }
         Returns: {
           average_rating: number
-          total_reviews: number
           rating_distribution: Json
+          total_reviews: number
         }[]
       }
       create_notification: {
         Args: {
-          target_user_id: string
-          notification_type: string
-          notification_title: string
-          notification_message: string
-          notification_data?: Json
           notification_action_url?: string
+          notification_data?: Json
+          notification_message: string
+          notification_title: string
+          notification_type: string
+          target_user_id: string
         }
         Returns: string
       }
       get_ambassador_by_referral: {
         Args: { referral_code: string }
         Returns: {
+          asaas_split_config: Json
+          commission_rate: number
           id: string
           user_id: string
-          commission_rate: number
-          asaas_split_config: Json
         }[]
       }
       get_google_places_api_key: {
@@ -1052,8 +1052,8 @@ export type Database = {
       }
       remove_user_role: {
         Args: {
-          user_uuid: string
           old_role: Database["public"]["Enums"]["user_role"]
+          user_uuid: string
         }
         Returns: undefined
       }
@@ -1062,13 +1062,13 @@ export type Database = {
         Returns: undefined
       }
       user_has_permission: {
-        Args: { user_uuid: string; permission_name: string }
+        Args: { permission_name: string; user_uuid: string }
         Returns: boolean
       }
       user_has_role: {
         Args: {
-          user_uuid: string
           role_name: Database["public"]["Enums"]["user_role"]
+          user_uuid: string
         }
         Returns: boolean
       }

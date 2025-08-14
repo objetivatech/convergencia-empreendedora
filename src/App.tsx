@@ -20,6 +20,9 @@ import AmbassadorDashboard from "./pages/AmbassadorDashboard";
 import Dashboard from "./pages/Dashboard";
 import PlanSelection from "./pages/PlanSelection";
 import TransparentCheckoutPage from "./pages/TransparentCheckoutPage";
+import Admin from "./pages/Admin";
+import AdminUsers from "./pages/AdminUsers";
+import AdminBlog from "./pages/AdminBlog";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -70,6 +73,33 @@ const App = () => (
             {/* Legacy routes */}
             <Route path="/about" element={<About />} />
             <Route path="/projects" element={<Projects />} />
+            
+            {/* Admin Routes */}
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute adminOnly>
+                  <Admin />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/usuarios" 
+              element={
+                <ProtectedRoute adminOnly>
+                  <AdminUsers />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/blog" 
+              element={
+                <ProtectedRoute>
+                  <AdminBlog />
+                </ProtectedRoute>
+              } 
+            />
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
