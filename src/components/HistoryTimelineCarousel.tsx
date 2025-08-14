@@ -9,6 +9,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { ZoomIn } from "lucide-react";
+import Autoplay from "embla-carousel-autoplay";
 
 // Import all timeline images
 import timelineApaeGravatai from "@/assets/timeline-apae-gravatai.jpg";
@@ -206,6 +207,13 @@ export const HistoryTimelineCarousel = () => {
 
         <div className="max-w-6xl mx-auto">
           <Carousel
+            plugins={[
+              Autoplay({
+                delay: 4000,
+                stopOnInteraction: true,
+                stopOnMouseEnter: true,
+              }),
+            ]}
             opts={{
               align: "start",
               loop: true,
