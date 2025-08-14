@@ -124,72 +124,22 @@ export default function PlanSelection() {
     return featureList;
   };
 
-  const handlePlanSelect = async (planId: string, billingCycle: 'monthly' | 'yearly' | 'semestral') => {
-    try {
-      console.log('Starting plan selection:', { planId, billingCycle });
-      
-      toast({
-        title: "Processando...",
-        description: "Criando sua assinatura...",
-      });
-
-      const { data, error } = await supabase.functions.invoke('create-subscription', {
-        body: {
-          planId,
-          billingCycle
-        }
-      });
-
-      console.log('Supabase function response:', { data, error });
-
-      if (error) {
-        console.error('Supabase function error:', error);
-        throw new Error(error.message || 'Erro na função do servidor');
-      }
-
-      console.log('Checking if data exists:', !!data);
-      console.log('Checking data.success:', data?.success);
-      console.log('Checking data.paymentUrl:', data?.paymentUrl);
-
-      if (data?.success && data?.paymentUrl) {
-        console.log('Success condition met, proceeding with payment...');
-        
-        toast({
-          title: "Assinatura Criada!",
-          description: "Redirecionando para o pagamento...",
-        });
-        
-        console.log('About to open payment URL:', data.paymentUrl);
-        
-        // Abrir URL de pagamento em nova aba
-        const paymentWindow = window.open(data.paymentUrl, '_blank');
-        console.log('Payment window opened:', !!paymentWindow);
-        
-        if (paymentWindow) {
-          console.log('Payment window opened successfully, will navigate to dashboard in 2 seconds');
-          // Redirecionar para dashboard após um tempo
-          setTimeout(() => {
-            console.log('Navigating to dashboard...');
-            navigate('/dashboard');
-          }, 2000);
-        } else {
-          console.log('Payment window blocked, redirecting directly...');
-          // Se não conseguiu abrir a janela, redirecionar para o URL de pagamento
-          window.location.href = data.paymentUrl;
-        }
-      } else {
-        console.error('Success condition not met. Data:', data);
-        throw new Error(data?.error || 'Resposta inválida do servidor');
-      }
-      
-    } catch (error: any) {
-      console.error('Error selecting plan:', error);
+  const handlePlanSelect = (planId: string, billingCycle: 'monthly' | 'yearly' | 'semestral') => {
+    const plan = plans.find(p => p.id === planId);
+    if (!plan) {
       toast({
         title: "Erro",
-        description: error.message || "Não foi possível criar a assinatura. Tente novamente.",
+        description: "Plano não encontrado",
         variant: "destructive",
       });
+      return;
     }
+
+    // Mapear semestral para monthly para compatibilidade
+    const cycle = billingCycle === 'semestral' ? 'monthly' : billingCycle;
+
+    // Redirecionar para página de checkout transparente
+    navigate(`/checkout/transparente/${planId}?cycle=${cycle}`);
   };
 
   if (loading) {

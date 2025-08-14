@@ -64,12 +64,12 @@ serve(async (req) => {
       throw new Error(`Failed to fetch subscriptions: ${fetchError.message}`);
     }
 
-    logStep("Pending subscriptions found", { count: pendingSubscriptions?.length });
+    logStep("Subscriptions found", { count: subscriptions?.length });
 
-    if (!pendingSubscriptions || pendingSubscriptions.length === 0) {
+    if (!subscriptions || subscriptions.length === 0) {
       return new Response(JSON.stringify({
         success: true,
-        message: 'No pending subscriptions found',
+        message: 'No subscriptions found',
         updated: 0
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -80,7 +80,7 @@ serve(async (req) => {
     let deletedCount = 0;
 
     // Verificar cada assinatura no ASAAS
-    for (const subscription of pendingSubscriptions as SupabaseUserSubscription[]) {
+    for (const subscription of subscriptions as SupabaseUserSubscription[]) {
       if (!subscription.external_subscription_id) {
         logStep("Subscription without external ID, skipping", { id: subscription.id });
         continue;
@@ -98,8 +98,71 @@ serve(async (req) => {
         });
 
         if (asaasResponse.status === 404) {
-          // Assinatura não existe mais no ASAAS - deletar do banco
-          logStep("Subscription not found in ASAAS, deleting", { 
+          // Subscription not found - check for individual payment
+          logStep("Subscription not found, checking for individual payment");
+          
+          // Search for payment by externalReference
+          const paymentResponse = await fetch(
+            `https://www.asaas.com/api/v3/payments?externalReference=${subscription.external_subscription_id}`,
+            {
+              headers: {
+                'access_token': asaasApiKey,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+
+          if (paymentResponse.ok) {
+            const paymentResult = await paymentResponse.json();
+            if (paymentResult.data && paymentResult.data.length > 0) {
+              const payment = paymentResult.data[0];
+              logStep("Found individual payment", { paymentId: payment.id, status: payment.status });
+              
+              // Map payment status
+              let newStatus = subscription.status;
+              switch (payment.status) {
+                case 'CONFIRMED':
+                case 'RECEIVED':
+                  newStatus = 'active';
+                  break;
+                case 'PENDING':
+                  newStatus = 'pending';
+                  break;
+                case 'OVERDUE':
+                  newStatus = 'overdue';
+                  break;
+                default:
+                  newStatus = 'expired';
+              }
+
+              if (newStatus !== subscription.status) {
+                logStep("Updating subscription status based on payment", { 
+                  subscriptionId: subscription.id, 
+                  oldStatus: subscription.status, 
+                  newStatus 
+                });
+
+                const { error: updateError } = await supabaseService
+                  .from('user_subscriptions')
+                  .update({ 
+                    status: newStatus,
+                    updated_at: new Date().toISOString()
+                  })
+                  .eq('id', subscription.id);
+
+                if (updateError) {
+                  logStep("Error updating subscription", { error: updateError.message });
+                } else {
+                  updatedCount++;
+                  logStep("Subscription updated successfully");
+                }
+              }
+              continue;
+            }
+          }
+
+          // If neither subscription nor payment found, delete
+          logStep("Neither subscription nor payment found in ASAAS, deleting", { 
             subscriptionId: subscription.id,
             externalId: subscription.external_subscription_id 
           });
@@ -167,7 +230,7 @@ serve(async (req) => {
     }
 
     logStep("Sync completed", { 
-      totalProcessed: pendingSubscriptions.length,
+      totalProcessed: subscriptions.length,
       updated: updatedCount,
       deleted: deletedCount 
     });
@@ -177,7 +240,7 @@ serve(async (req) => {
       message: `Sync completed: ${updatedCount} updated, ${deletedCount} deleted`,
       updated: updatedCount,
       deleted: deletedCount,
-      total: pendingSubscriptions.length
+      total: subscriptions.length
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

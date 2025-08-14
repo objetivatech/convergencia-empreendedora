@@ -129,10 +129,11 @@ export default function TransparentCheckoutPage() {
 
         {/* Checkout Component */}
         <TransparentCheckout
+          type="subscription"
           planId={plan.id}
-          billingCycle={billingCycle}
           planName={plan.display_name}
-          price={price}
+          billingCycle={billingCycle}
+          totalValue={price}
           onSuccess={handleSuccess}
           onCancel={handleCancel}
         />
