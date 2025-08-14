@@ -207,17 +207,12 @@ serve(async (req) => {
       const createPaymentUrl = "https://www.asaas.com/api/v3/payments";
       const paymentData: any = {
         customer: customerId,
-        billingType: paymentMethod || "CREDIT_CARD",
+        billingType: "CREDIT_CARD", // Usar cartão de crédito como padrão
         value: value,
         dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Amanhã
         description: `${description} - Primeira cobrança`,
         externalReference: subscriptionResult.id, // Referência à assinatura
       };
-
-      // Para PIX, definir configurações específicas
-      if (paymentMethod === "PIX") {
-        paymentData.pixAddressKey = null; // Usar chave padrão do ASAAS
-      }
 
       logStep("Creating initial payment", paymentData);
 
