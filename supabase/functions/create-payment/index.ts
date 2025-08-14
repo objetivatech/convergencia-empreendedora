@@ -102,6 +102,36 @@ serve(async (req) => {
     if (searchResult.data && searchResult.data.length > 0) {
       customerId = searchResult.data[0].id;
       logStep("Existing customer found", { customerId });
+      
+      // Atualizar cliente existente com CPF/CNPJ se necessário
+      const existingCustomer = searchResult.data[0];
+      if (!existingCustomer.cpfCnpj && paymentData.customerData.cpfCnpj) {
+        const updateCustomerUrl = `https://www.asaas.com/api/v3/customers/${customerId}`;
+        const updateData = {
+          name: paymentData.customerData.name,
+          cpfCnpj: paymentData.customerData.cpfCnpj,
+          phone: paymentData.customerData.phone,
+        };
+        
+        if (paymentData.customerData.address) {
+          updateData.address = paymentData.customerData.address.street;
+          updateData.addressNumber = paymentData.customerData.address.number;
+          updateData.province = paymentData.customerData.address.city;
+          updateData.state = paymentData.customerData.address.state;
+          updateData.postalCode = paymentData.customerData.address.postalCode;
+        }
+        
+        await fetch(updateCustomerUrl, {
+          method: 'PUT',
+          headers: {
+            'access_token': asaasApiKey,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updateData),
+        });
+        
+        logStep("Customer updated with CPF/CNPJ", { customerId });
+      }
     } else {
       // Criar novo cliente
       const createCustomerUrl = "https://www.asaas.com/api/v3/customers";
