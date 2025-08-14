@@ -19,6 +19,7 @@ import BusinessDashboard from "./pages/BusinessDashboard";
 import AmbassadorDashboard from "./pages/AmbassadorDashboard";
 import Dashboard from "./pages/Dashboard";
 import PlanSelection from "./pages/PlanSelection";
+import TransparentCheckoutPage from "./pages/TransparentCheckoutPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,11 @@ const App = () => (
             <Route path="/planos" element={
               <ProtectedRoute>
                 <PlanSelection />
+              </ProtectedRoute>
+            } />
+            <Route path="/checkout/transparente/:planId" element={
+              <ProtectedRoute>
+                <TransparentCheckoutPage />
               </ProtectedRoute>
             } />
             <Route path="/dashboard-negocio" element={
