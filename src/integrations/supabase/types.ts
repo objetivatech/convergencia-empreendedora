@@ -1179,6 +1179,7 @@ export type Database = {
           featured: boolean
           gallery_images: string[]
           id: string
+          instagram: string
           latitude: number
           logo_url: string
           longitude: number
@@ -1187,6 +1188,7 @@ export type Database = {
           state: string
           subcategory: string
           views_count: number
+          website: string
         }[]
       }
       get_public_businesses: {
@@ -1202,6 +1204,7 @@ export type Database = {
           featured: boolean
           gallery_images: string[]
           id: string
+          instagram: string
           latitude: number
           logo_url: string
           longitude: number
@@ -1209,6 +1212,7 @@ export type Database = {
           state: string
           subcategory: string
           views_count: number
+          website: string
         }[]
       }
       remove_user_role: {

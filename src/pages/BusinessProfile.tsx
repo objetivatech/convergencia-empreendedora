@@ -30,26 +30,20 @@ interface Business {
   description: string;
   category: string;
   subcategory: string;
-  phone: string;
-  email: string;
-  website: string;
-  instagram: string;
-  whatsapp: string;
-  address: string;
   city: string;
   state: string;
-  postal_code: string;
   latitude: number;
   longitude: number;
   logo_url: string;
   cover_image_url: string;
   gallery_images: string[];
   opening_hours: any;
+  website?: string;
+  instagram?: string;
   views_count: number;
   clicks_count: number;
   contacts_count: number;
   featured: boolean;
-  subscription_active: boolean;
   created_at: string;
 }
 
@@ -69,15 +63,14 @@ const BusinessProfile = () => {
   const fetchBusiness = async () => {
     try {
       const { data, error } = await supabase
-        .from('businesses')
-        .select('*')
-        .eq('id', id)
-        .eq('subscription_active', true)
-        .single();
+        .rpc('get_public_business_by_id', { p_business_id: id });
 
       if (error) throw error;
-      setBusiness(data);
-      setSelectedImage(data.cover_image_url || "");
+      const businessData = data?.[0];
+      if (businessData) {
+        setBusiness(businessData);
+        setSelectedImage(businessData.cover_image_url || "");
+      }
     } catch (error) {
       console.error('Erro ao buscar negócio:', error);
     } finally {
@@ -118,28 +111,35 @@ const BusinessProfile = () => {
     }
   };
 
-  const handleContactClick = (type: 'phone' | 'whatsapp' | 'email' | 'website' | 'instagram') => {
+  const handleContactClick = async (type: 'phone' | 'whatsapp' | 'email' | 'website' | 'instagram') => {
     updateContactMetrics('contact');
     
-    if (!business) return;
+    if (!business || !id) return;
+
+    // Get sensitive contact info for authenticated users
+    const { data: contactData } = await supabase
+      .rpc('get_business_contacts', { p_business_id: id });
+    
+    const contacts = contactData?.[0];
+    if (!contacts) return;
 
     switch (type) {
       case 'phone':
-        window.open(`tel:${business.phone}`, '_blank');
+        if (contacts.phone) window.open(`tel:${contacts.phone}`, '_blank');
         break;
       case 'whatsapp':
-        window.open(`https://wa.me/${business.whatsapp.replace(/\D/g, '')}`, '_blank');
+        if (contacts.whatsapp) window.open(`https://wa.me/${contacts.whatsapp.replace(/\D/g, '')}`, '_blank');
         break;
       case 'email':
-        window.open(`mailto:${business.email}`, '_blank');
+        if (contacts.email) window.open(`mailto:${contacts.email}`, '_blank');
         break;
       case 'website':
         updateContactMetrics('click');
-        window.open(business.website, '_blank');
+        if (business.website) window.open(business.website, '_blank');
         break;
       case 'instagram':
         updateContactMetrics('click');
-        window.open(`https://instagram.com/${business.instagram.replace('@', '')}`, '_blank');
+        if (business.instagram) window.open(`https://instagram.com/${business.instagram.replace('@', '')}`, '_blank');
         break;
     }
   };
@@ -234,11 +234,10 @@ const BusinessProfile = () => {
                         <Badge variant="outline">{business.subcategory}</Badge>
                       )}
                     </div>
-                    <div className="flex items-center text-muted-foreground mb-4">
-                      <MapPin className="h-4 w-4 mr-2" />
-                      <span>{business.address}, {business.city}, {business.state}</span>
-                      {business.postal_code && <span> - {business.postal_code}</span>}
-                    </div>
+                     <div className="flex items-center text-muted-foreground mb-4">
+                       <MapPin className="h-4 w-4 mr-2" />
+                       <span>{business.city}, {business.state}</span>
+                     </div>
                   </div>
                   
                   {business.logo_url && (
@@ -285,37 +284,31 @@ const BusinessProfile = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {business.phone && (
-                    <Button 
-                      onClick={() => handleContactClick('phone')}
-                      className="justify-start"
-                    >
-                      <Phone className="h-4 w-4 mr-2" />
-                      {business.phone}
-                    </Button>
-                  )}
+                  <Button 
+                    onClick={() => handleContactClick('phone')}
+                    className="justify-start"
+                  >
+                    <Phone className="h-4 w-4 mr-2" />
+                    Telefone
+                  </Button>
                   
-                  {business.whatsapp && (
-                    <Button 
-                      onClick={() => handleContactClick('whatsapp')}
-                      variant="outline"
-                      className="justify-start"
-                    >
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      WhatsApp
-                    </Button>
-                  )}
+                  <Button 
+                    onClick={() => handleContactClick('whatsapp')}
+                    variant="outline"
+                    className="justify-start"
+                  >
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    WhatsApp
+                  </Button>
                   
-                  {business.email && (
-                    <Button 
-                      onClick={() => handleContactClick('email')}
-                      variant="outline"
-                      className="justify-start"
-                    >
-                      <Mail className="h-4 w-4 mr-2" />
-                      {business.email}
-                    </Button>
-                  )}
+                  <Button 
+                    onClick={() => handleContactClick('email')}
+                    variant="outline"
+                    className="justify-start"
+                  >
+                    <Mail className="h-4 w-4 mr-2" />
+                    E-mail
+                  </Button>
                   
                   {business.website && (
                     <Button 
@@ -399,15 +392,15 @@ const BusinessProfile = () => {
               </CardContent>
             </Card>
 
-            {/* Interactive Map */}
-            {business.latitude && business.longitude && (
-              <BusinessMap
-                latitude={business.latitude}
-                longitude={business.longitude}
-                businessName={business.name}
-                address={`${business.address}, ${business.city}, ${business.state}`}
-              />
-            )}
+             {/* Interactive Map */}
+             {business.latitude && business.longitude && (
+               <BusinessMap
+                 latitude={business.latitude}
+                 longitude={business.longitude}
+                 businessName={business.name}
+                 address={`${business.city}, ${business.state}`}
+               />
+             )}
           </div>
         </div>
       </div>

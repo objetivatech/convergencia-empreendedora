@@ -20,25 +20,20 @@ interface Business {
   description: string;
   category: string;
   subcategory: string;
-  phone: string;
-  email: string;
-  website: string;
-  instagram: string;
-  whatsapp: string;
-  address: string;
   city: string;
   state: string;
-  postal_code: string;
   latitude: number;
   longitude: number;
   logo_url: string;
   cover_image_url: string;
   gallery_images: string[];
+  website?: string;
+  instagram?: string;
   views_count: number;
   clicks_count: number;
   contacts_count: number;
   featured: boolean;
-  subscription_active: boolean;
+  created_at: string;
 }
 
 const Directory = () => {
@@ -90,11 +85,7 @@ const Directory = () => {
   const fetchBusinesses = async () => {
     try {
       const { data, error } = await supabase
-        .from('businesses')
-        .select('*')
-        .eq('subscription_active', true)
-        .order('featured', { ascending: false })
-        .order('created_at', { ascending: false });
+        .rpc('get_public_businesses');
 
       if (error) throw error;
       setBusinesses(data || []);
@@ -199,7 +190,7 @@ const Directory = () => {
     updateBusinessMetrics(businessId, 'view');
   };
 
-  const handleContactClick = (businessId: string, e: React.MouseEvent) => {
+  const handleContactClick = async (businessId: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     updateBusinessMetrics(businessId, 'contact');
@@ -432,51 +423,45 @@ const Directory = () => {
                     </div>
                   </CardHeader>
 
-                  <CardContent className="card-padding pt-0">
-                    {/* Contact Buttons */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {business.phone && (
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={(e) => {
-                            handleContactClick(business.id, e);
-                            window.open(`tel:${business.phone}`, '_blank');
-                          }}
-                        >
-                          <Phone className="h-3 w-3 mr-1" />
-                          Ligar
-                        </Button>
-                      )}
-                      
-                      {business.whatsapp && (
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={(e) => {
-                            handleContactClick(business.id, e);
-                            window.open(`https://wa.me/${business.whatsapp.replace(/\D/g, '')}`, '_blank');
-                          }}
-                        >
-                          <MessageCircle className="h-3 w-3 mr-1" />
-                          WhatsApp
-                        </Button>
-                      )}
-                      
-                      {business.website && (
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={(e) => {
-                            handleWebsiteClick(business.id, e);
-                            window.open(business.website, '_blank');
-                          }}
-                        >
-                          <Globe className="h-3 w-3 mr-1" />
-                          Site
-                        </Button>
-                      )}
-                    </div>
+                   <CardContent className="card-padding pt-0">
+                     {/* Contact Buttons */}
+                     <div className="flex flex-wrap gap-2 mb-4">
+                       <Button 
+                         size="sm" 
+                         variant="outline"
+                         onClick={(e) => {
+                           handleContactClick(business.id, e);
+                         }}
+                       >
+                         <Phone className="h-3 w-3 mr-1" />
+                         Ligar
+                       </Button>
+                       
+                       <Button 
+                         size="sm" 
+                         variant="outline"
+                         onClick={(e) => {
+                           handleContactClick(business.id, e);
+                         }}
+                       >
+                         <MessageCircle className="h-3 w-3 mr-1" />
+                         WhatsApp
+                       </Button>
+                       
+                       {business.website && (
+                         <Button 
+                           size="sm" 
+                           variant="outline"
+                           onClick={(e) => {
+                             handleWebsiteClick(business.id, e);
+                             window.open(business.website, '_blank');
+                           }}
+                         >
+                           <Globe className="h-3 w-3 mr-1" />
+                           Site
+                         </Button>
+                       )}
+                     </div>
 
                     {/* Metrics */}
                     <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
