@@ -1142,6 +1142,18 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_business_contacts: {
+        Args: { p_business_id: string }
+        Returns: {
+          address: string
+          email: string
+          instagram: string
+          phone: string
+          postal_code: string
+          website: string
+          whatsapp: string
+        }[]
+      }
       get_current_user_admin_status: {
         Args: Record<PropertyKey, never>
         Returns: boolean
@@ -1153,6 +1165,51 @@ export type Database = {
       get_google_places_api_key: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_public_business_by_id: {
+        Args: { p_business_id: string }
+        Returns: {
+          category: string
+          city: string
+          clicks_count: number
+          contacts_count: number
+          cover_image_url: string
+          created_at: string
+          description: string
+          featured: boolean
+          gallery_images: string[]
+          id: string
+          latitude: number
+          logo_url: string
+          longitude: number
+          name: string
+          opening_hours: Json
+          state: string
+          subcategory: string
+          views_count: number
+        }[]
+      }
+      get_public_businesses: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          category: string
+          city: string
+          clicks_count: number
+          contacts_count: number
+          cover_image_url: string
+          created_at: string
+          description: string
+          featured: boolean
+          gallery_images: string[]
+          id: string
+          latitude: number
+          logo_url: string
+          longitude: number
+          name: string
+          state: string
+          subcategory: string
+          views_count: number
+        }[]
       }
       remove_user_role: {
         Args: {
