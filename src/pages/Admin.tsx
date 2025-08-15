@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import Layout from "@/components/Layout";
 import { 
   Users, 
   Building2, 
@@ -34,12 +35,14 @@ export default function Admin() {
 
   if (profileLoading || statsLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
-          <p className="text-muted-foreground mt-4">Carregando painel administrativo...</p>
+      <Layout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
+            <p className="text-muted-foreground mt-4">Carregando painel administrativo...</p>
+          </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
@@ -93,7 +96,7 @@ export default function Admin() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <Layout>
       <div className="border-b bg-card">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
@@ -223,6 +226,6 @@ export default function Admin() {
           </Card>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }
