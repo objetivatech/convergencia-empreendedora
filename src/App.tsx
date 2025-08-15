@@ -28,6 +28,7 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import BlogRSS from "./pages/BlogRSS";
+import AdminTest from "./pages/AdminTest";
 import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
@@ -118,6 +119,14 @@ const App = () => (
               element={
                 <ProtectedRoute adminOnly={true}>
                   <AdminNewsletter />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/test" 
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <AdminTest />
                 </ProtectedRoute>
               } 
             />

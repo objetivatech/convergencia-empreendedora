@@ -1,4 +1,4 @@
-import { Heart, Mail, Phone, MapPin, Instagram, Facebook, Linkedin } from "lucide-react";
+import { Heart, Mail, Phone, MapPin, Instagram, Facebook, Linkedin, Rss } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
@@ -29,6 +29,13 @@ const Footer = () => {
               <a href="#" className="text-white/70 hover:text-white transition-colors">
                 <Linkedin className="h-5 w-5" />
               </a>
+              <Link 
+                to="/rss" 
+                className="text-white/70 hover:text-white transition-colors"
+                title="Feed RSS do Blog - Acompanhe nossos posts"
+              >
+                <Rss className="h-5 w-5" />
+              </Link>
             </div>
           </div>
 
@@ -57,13 +64,13 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/diretorios" className="hover:text-white transition-colors">
-                  Diretórios
+                <Link to="/diretorio" className="hover:text-white transition-colors">
+                  Diretório
                 </Link>
               </li>
               <li>
-                <Link to="/comunidade" className="hover:text-white transition-colors">
-                  Comunidade
+                <Link to="/rss" className="hover:text-white transition-colors">
+                  Feed RSS
                 </Link>
               </li>
             </ul>
@@ -95,6 +102,11 @@ const Footer = () => {
         
         <div className="border-t border-white/20 mt-8 pt-8 text-center text-white/70">
           <p>&copy; 2024 Mulheres em Convergência. Todos os direitos reservados.</p>
+          <p className="mt-2 text-sm">
+            <Link to="/rss" className="hover:text-white transition-colors">
+              Acompanhe nosso blog via RSS
+            </Link>
+          </p>
         </div>
       </div>
     </footer>

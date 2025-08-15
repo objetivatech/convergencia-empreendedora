@@ -41,7 +41,6 @@ class MailRelayAPI {
     const options: RequestInit = {
       method,
       headers,
-      timeout: 30000, // 30 seconds timeout
     };
 
     if (data && (method === 'POST' || method === 'PUT')) {
@@ -179,7 +178,7 @@ async function processMailRelaySyncOperation(operation: any) {
       case 'create':
         const subscriberData: MailRelaySubscriber = {
           email: requestData.email,
-          name: requestData.name,
+          name: requestData.name || requestData.email.split('@')[0],
           custom_fields: {
             cpf: requestData.cpf,
             user_type: requestData.user_type,
@@ -195,7 +194,8 @@ async function processMailRelaySyncOperation(operation: any) {
             .from('newsletter_subscribers')
             .update({ 
               mailrelay_id: responseData.id,
-              synced_at: new Date().toISOString()
+              synced_at: new Date().toISOString(),
+              last_sync_error: null
             })
             .eq('id', operation.entity_id);
         }
@@ -213,14 +213,14 @@ async function processMailRelaySyncOperation(operation: any) {
           try {
             await mailrelay.addToGroup(requestData.email, groupId);
           } catch (error) {
-            console.log(`Grupo ${groupId} não existe, continuando...`);
+            console.log(`Erro ao adicionar ao grupo ${groupId}:`, error.message);
           }
         }
         break;
 
       case 'update':
         responseData = await mailrelay.updateSubscriber(requestData.email, {
-          name: requestData.name,
+          name: requestData.name || requestData.email.split('@')[0],
           custom_fields: {
             cpf: requestData.cpf,
             user_type: requestData.user_type,
@@ -262,6 +262,16 @@ async function processMailRelaySyncOperation(operation: any) {
       })
       .eq('id', operation.id);
 
+    // Atualizar também o subscriber com erro se for esse tipo de operação
+    if (operation.entity_type === 'subscriber' && operation.entity_id) {
+      await supabase
+        .from('newsletter_subscribers')
+        .update({ 
+          last_sync_error: error.message 
+        })
+        .eq('id', operation.entity_id);
+    }
+
     return { success: false, error: error.message };
   }
 }
@@ -299,7 +309,7 @@ serve(async (req) => {
         .select('*')
         .eq('id', operation_id)
         .eq('status', 'pending')
-        .single();
+        .maybeSingle();
 
       if (!operation) {
         return new Response(
