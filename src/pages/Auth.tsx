@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
@@ -27,7 +28,8 @@ export default function Auth() {
     password: "",
     confirmPassword: "",
     fullName: "",
-    phone: ""
+    phone: "",
+    newsletterSubscribed: true
   });
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -91,7 +93,8 @@ export default function Auth() {
           emailRedirectTo: redirectUrl,
           data: {
             full_name: signupForm.fullName,
-            phone: signupForm.phone
+            phone: signupForm.phone,
+            newsletter_subscribed: signupForm.newsletterSubscribed
           }
         }
       });
@@ -303,6 +306,19 @@ export default function Auth() {
                         }
                         required
                       />
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="newsletter"
+                        checked={signupForm.newsletterSubscribed}
+                        onCheckedChange={(checked) =>
+                          setSignupForm({ ...signupForm, newsletterSubscribed: checked as boolean })
+                        }
+                      />
+                      <Label htmlFor="newsletter" className="text-sm">
+                        Quero receber novidades e atualizações por email
+                      </Label>
                     </div>
 
                     {error && (

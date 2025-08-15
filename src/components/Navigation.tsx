@@ -85,6 +85,12 @@ const Navigation = () => {
                     <span className="hidden sm:inline">Dashboard</span>
                   </Button>
                 </Link>
+                <Link to="/perfil">
+                  <Button variant="outline" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm">
+                    <Settings className="h-4 w-4" />
+                    <span className="hidden sm:inline">Perfil</span>
+                  </Button>
+                </Link>
                 {isAdmin() && (
                   <Link to="/admin">
                     <Button variant="outline" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm border-primary/20 hover:bg-primary/10">
