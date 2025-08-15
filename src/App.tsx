@@ -26,6 +26,7 @@ import AdminBlog from "./pages/AdminBlog";
 import AdminNewsletter from "./pages/AdminNewsletter";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -85,7 +87,7 @@ const App = () => (
             <Route 
               path="/admin" 
               element={
-                <ProtectedRoute adminOnly>
+                <ProtectedRoute adminOnly={true}>
                   <Admin />
                 </ProtectedRoute>
               } 
@@ -93,7 +95,7 @@ const App = () => (
             <Route 
               path="/admin/usuarios" 
               element={
-                <ProtectedRoute adminOnly>
+                <ProtectedRoute adminOnly={true}>
                   <AdminUsers />
                 </ProtectedRoute>
               } 
@@ -101,7 +103,7 @@ const App = () => (
             <Route 
               path="/admin/blog" 
               element={
-                <ProtectedRoute>
+                <ProtectedRoute adminOnly={true}>
                   <AdminBlog />
                 </ProtectedRoute>
               } 
@@ -109,7 +111,7 @@ const App = () => (
             <Route 
               path="/admin/newsletter" 
               element={
-                <ProtectedRoute>
+                <ProtectedRoute adminOnly={true}>
                   <AdminNewsletter />
                 </ProtectedRoute>
               } 

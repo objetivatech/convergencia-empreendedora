@@ -102,13 +102,15 @@ export default function AdminNewsletter() {
   const handleSyncWithMailRelay = async () => {
     setIsSyncing(true);
     try {
-      const { data, error } = await supabase.functions.invoke('mailrelay-sync');
+      const { data, error } = await supabase.functions.invoke('mailrelay-sync', {
+        body: { batch_sync: true }
+      });
       
       if (error) throw error;
 
       toast({
         title: "Sincronização iniciada",
-        description: `Processando ${data.processed || 0} operações pendentes.`,
+        description: `Processando ${data?.processed || 0} operações pendentes.`,
       });
 
       // Recarregar dados após sincronização
@@ -120,7 +122,7 @@ export default function AdminNewsletter() {
       console.error('Erro na sincronização:', error);
       toast({
         title: "Erro na sincronização",
-        description: "Erro ao sincronizar com MailRelay.",
+        description: error?.message || "Erro ao sincronizar com MailRelay.",
         variant: "destructive",
       });
     } finally {

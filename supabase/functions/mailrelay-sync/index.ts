@@ -193,7 +193,25 @@ serve(async (req) => {
   try {
     if (req.method === 'POST') {
       // Processar operação específica
-      const { operation_id } = await req.json();
+      const body = await req.text();
+      if (!body.trim()) {
+        return new Response(
+          JSON.stringify({ error: 'Body da requisição vazio' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      let jsonData;
+      try {
+        jsonData = JSON.parse(body);
+      } catch (parseError) {
+        return new Response(
+          JSON.stringify({ error: 'JSON inválido no body da requisição' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      const { operation_id } = jsonData;
       
       const { data: operation } = await supabase
         .from('mailrelay_sync_log')
