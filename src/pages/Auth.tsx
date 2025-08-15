@@ -9,13 +9,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, KeyRound } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 
 export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState("login");
   const navigate = useNavigate();
 
   const [loginForm, setLoginForm] = useState({
@@ -30,6 +31,10 @@ export default function Auth() {
     fullName: "",
     phone: "",
     newsletterSubscribed: true
+  });
+
+  const [recoveryForm, setRecoveryForm] = useState({
+    email: ""
   });
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -122,6 +127,31 @@ export default function Auth() {
     }
   };
 
+  const handlePasswordRecovery = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(recoveryForm.email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
+
+      if (error) {
+        setError(error.message);
+        return;
+      }
+
+      toast.success("Email de recuperação enviado! Verifique sua caixa de entrada.");
+      setRecoveryForm({ email: "" });
+    } catch (error) {
+      console.error("Error in password recovery:", error);
+      setError("Erro interno. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Layout showSidebar={false}>
       <div className="container mx-auto px-4 py-8">
@@ -135,10 +165,11 @@ export default function Auth() {
             </p>
           </div>
 
-          <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="login">Entrar</TabsTrigger>
               <TabsTrigger value="signup">Cadastrar</TabsTrigger>
+              <TabsTrigger value="recovery">Recuperar</TabsTrigger>
             </TabsList>
 
             <TabsContent value="login">
@@ -207,6 +238,16 @@ export default function Auth() {
                       {loading ? "Entrando..." : "Entrar"}
                     </Button>
                   </form>
+                  
+                  <div className="text-center mt-4">
+                    <Button 
+                      variant="link" 
+                      className="text-sm text-muted-foreground hover:text-primary p-0"
+                      onClick={() => setActiveTab("recovery")}
+                    >
+                      Esqueceu sua senha?
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -329,6 +370,47 @@ export default function Auth() {
 
                     <Button type="submit" className="w-full" disabled={loading}>
                       {loading ? "Criando conta..." : "Criar Conta"}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="recovery">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <KeyRound className="h-5 w-5" />
+                    Recuperar Senha
+                  </CardTitle>
+                  <CardDescription>
+                    Digite seu email para receber as instruções de recuperação
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handlePasswordRecovery} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="recovery-email">Email</Label>
+                      <Input
+                        id="recovery-email"
+                        type="email"
+                        placeholder="seu@email.com"
+                        value={recoveryForm.email}
+                        onChange={(e) =>
+                          setRecoveryForm({ ...recoveryForm, email: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
+
+                    {error && (
+                      <Alert variant="destructive">
+                        <AlertDescription>{error}</AlertDescription>
+                      </Alert>
+                    )}
+
+                    <Button type="submit" className="w-full" disabled={loading}>
+                      {loading ? "Enviando..." : "Enviar Email de Recuperação"}
                     </Button>
                   </form>
                 </CardContent>
