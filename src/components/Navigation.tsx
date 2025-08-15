@@ -9,12 +9,15 @@ import { useCartStore } from "@/hooks/useCartStore";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRoles } from "@/hooks/useUserRoles";
 
-const Navigation = () => {
+interface NavigationProps {
+  compact?: boolean;
+}
+
+const Navigation = ({ compact = false }: NavigationProps) => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const { getTotalItems } = useCartStore();
   const { user, signOut } = useAuth();
-  const { isAdmin } = useUserRoles();
   const totalItems = getTotalItems();
 
   const isActive = (path: string) => {
@@ -30,6 +33,39 @@ const Navigation = () => {
     { href: "/dashboard", label: "Meus Dashboards" },
     { href: "/comunidade", label: "Comunidade" },
   ];
+
+  // Compact mode for use in sidebar layout
+  if (compact) {
+    return (
+      <div className="flex items-center space-x-2">
+        {/* Cart */}
+        <Link to="/cart" className="relative">
+          <Button variant="outline" size="sm" className="gap-2">
+            <ShoppingCart className="h-4 w-4" />
+            <span>Carrinho</span>
+            {totalItems > 0 && (
+              <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 p-0 text-xs">
+                {totalItems}
+              </Badge>
+            )}
+          </Button>
+        </Link>
+
+        {/* Notifications */}
+        <NotificationCenter />
+
+        {/* Auth Button */}
+        {!user && (
+          <Link to="/auth">
+            <Button variant="outline" size="sm" className="gap-2">
+              <User className="h-4 w-4" />
+              Entrar
+            </Button>
+          </Link>
+        )}
+      </div>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -78,37 +114,15 @@ const Navigation = () => {
             <NotificationCenter />
 
             {user ? (
-              <div className="flex items-center space-x-2">
-                <Link to="/dashboard">
-                  <Button variant="outline" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm">
-                    <User className="h-4 w-4" />
-                    <span className="hidden sm:inline">Dashboard</span>
-                  </Button>
-                </Link>
-                <Link to="/perfil">
-                  <Button variant="outline" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm">
-                    <Settings className="h-4 w-4" />
-                    <span className="hidden sm:inline">Perfil</span>
-                  </Button>
-                </Link>
-                {isAdmin() && (
-                  <Link to="/admin">
-                    <Button variant="outline" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm border-primary/20 hover:bg-primary/10">
-                      <Settings className="h-4 w-4" />
-                      <span className="hidden sm:inline">Admin</span>
-                    </Button>
-                  </Link>
-                )}
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={signOut}
-                  className="gap-1 md:gap-2 text-xs md:text-sm"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span className="hidden sm:inline">Sair</span>
-                </Button>
-              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={signOut}
+                className="gap-1 md:gap-2 text-xs md:text-sm"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">Sair</span>
+              </Button>
             ) : (
               <Link to="/auth">
                 <Button variant="outline" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm">
@@ -141,19 +155,6 @@ const Navigation = () => {
                       {item.label}
                     </Link>
                   ))}
-                  
-                  {user && isAdmin() && (
-                    <Link
-                      to="/admin"
-                      onClick={() => setIsOpen(false)}
-                      className="text-sm font-medium transition-colors hover:text-primary px-4 py-2 rounded-md text-muted-foreground border-t border-border pt-4"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Settings className="h-4 w-4" />
-                        Painel Administrativo
-                      </div>
-                    </Link>
-                  )}
                 </div>
               </SheetContent>
             </Sheet>
