@@ -175,13 +175,13 @@ export const useAdminPermissions = () => {
     }
   };
 
-  const toggleAdminStatus = async (userId: string, isAdmin: boolean) => {
-    if (!isAdmin || !user) return;
+  const toggleAdminStatus = async (userId: string, isAdminFlag: boolean) => {
+    if (!isAdmin() || !user) return;
 
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ is_admin: isAdmin })
+        .update({ is_admin: isAdminFlag })
         .eq('id', userId);
 
       if (error) throw error;
@@ -189,7 +189,7 @@ export const useAdminPermissions = () => {
       // Log admin activity (will be implemented later)
       console.log('Admin activity logged:', {
         admin_id: user.id,
-        action: isAdmin ? 'grant_admin' : 'revoke_admin',
+         action: isAdminFlag ? 'grant_admin' : 'revoke_admin',
         target: userId
       });
 

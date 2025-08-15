@@ -1137,6 +1137,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      send_auth_email_via_mailrelay: {
+        Args: { email_type: string; recipient_email: string; user_data?: Json }
+        Returns: Json
+      }
+      setup_mailrelay_smtp: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       track_referral_click: {
         Args: { referral_code: string }
         Returns: undefined
