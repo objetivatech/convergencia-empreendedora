@@ -1191,6 +1191,24 @@ export type Database = {
           website: string
         }[]
       }
+      get_public_business_reviews: {
+        Args: {
+          business_uuid: string
+          limit_count?: number
+          offset_count?: number
+        }
+        Returns: {
+          business_id: string
+          comment: string
+          created_at: string
+          helpful_count: number
+          id: string
+          rating: number
+          reviewer_name: string
+          title: string
+          verified: boolean
+        }[]
+      }
       get_public_businesses: {
         Args: Record<PropertyKey, never>
         Returns: {

@@ -67,11 +67,11 @@ const BusinessReviews = ({ businessId, businessName }: BusinessReviewsProps) => 
   const fetchReviews = async () => {
     try {
       const { data, error } = await supabase
-        .from('business_reviews')
-        .select('*')
-        .eq('business_id', businessId)
-        .order('created_at', { ascending: false })
-        .limit(10);
+        .rpc('get_public_business_reviews', { 
+          business_uuid: businessId,
+          limit_count: 10,
+          offset_count: 0
+        });
 
       if (error) throw error;
       setReviews(data || []);
