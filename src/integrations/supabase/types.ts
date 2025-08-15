@@ -561,30 +561,90 @@ export type Database = {
           },
         ]
       }
+      mailrelay_sync_log: {
+        Row: {
+          created_at: string | null
+          entity_id: string | null
+          entity_type: string
+          error_message: string | null
+          id: string
+          mailrelay_id: string | null
+          operation: string
+          operation_type: string
+          processed_at: string | null
+          request_data: Json | null
+          response_data: Json | null
+          status: string
+        }
+        Insert: {
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type: string
+          error_message?: string | null
+          id?: string
+          mailrelay_id?: string | null
+          operation: string
+          operation_type: string
+          processed_at?: string | null
+          request_data?: Json | null
+          response_data?: Json | null
+          status?: string
+        }
+        Update: {
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string
+          error_message?: string | null
+          id?: string
+          mailrelay_id?: string | null
+          operation?: string
+          operation_type?: string
+          processed_at?: string | null
+          request_data?: Json | null
+          response_data?: Json | null
+          status?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           active: boolean | null
           email: string
           id: string
+          last_sync_error: string | null
+          mailrelay_id: string | null
           name: string | null
+          origin: string | null
           source: string | null
           subscribed_at: string | null
+          synced_at: string | null
+          user_type: string | null
         }
         Insert: {
           active?: boolean | null
           email: string
           id?: string
+          last_sync_error?: string | null
+          mailrelay_id?: string | null
           name?: string | null
+          origin?: string | null
           source?: string | null
           subscribed_at?: string | null
+          synced_at?: string | null
+          user_type?: string | null
         }
         Update: {
           active?: boolean | null
           email?: string
           id?: string
+          last_sync_error?: string | null
+          mailrelay_id?: string | null
           name?: string | null
+          origin?: string | null
           source?: string | null
           subscribed_at?: string | null
+          synced_at?: string | null
+          user_type?: string | null
         }
         Relationships: []
       }
@@ -685,6 +745,7 @@ export type Database = {
           can_edit_blog: boolean | null
           city: string | null
           country: string | null
+          cpf: string | null
           created_at: string | null
           email: string
           full_name: string | null
@@ -707,6 +768,7 @@ export type Database = {
           can_edit_blog?: boolean | null
           city?: string | null
           country?: string | null
+          cpf?: string | null
           created_at?: string | null
           email: string
           full_name?: string | null
@@ -729,6 +791,7 @@ export type Database = {
           can_edit_blog?: boolean | null
           city?: string | null
           country?: string | null
+          cpf?: string | null
           created_at?: string | null
           email?: string
           full_name?: string | null
@@ -1037,6 +1100,15 @@ export type Database = {
         }
         Returns: string
       }
+      evolve_newsletter_to_profile: {
+        Args: {
+          full_name?: string
+          phone?: string
+          user_cpf: string
+          user_email: string
+        }
+        Returns: string
+      }
       get_ambassador_by_referral: {
         Args: { referral_code: string }
         Returns: {
@@ -1045,6 +1117,14 @@ export type Database = {
           id: string
           user_id: string
         }[]
+      }
+      get_current_user_admin_status: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      get_current_user_blog_edit_status: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
       }
       get_google_places_api_key: {
         Args: Record<PropertyKey, never>
