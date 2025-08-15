@@ -26,6 +26,8 @@ import AdminBlog from "./pages/AdminBlog";
 import AdminNewsletter from "./pages/AdminNewsletter";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import ResetPassword from "./pages/ResetPassword";
+import BlogRSS from "./pages/BlogRSS";
 import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
@@ -41,6 +43,9 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/reset-password" element={<ResetPassword />} />
+            <Route path="/rss" element={<BlogRSS />} />
+            <Route path="/feed.xml" element={<BlogRSS />} />
             <Route path="/sobre" element={<About />} />
             <Route path="/projetos" element={<Projects />} />
             <Route path="/loja" element={<Shop />} />

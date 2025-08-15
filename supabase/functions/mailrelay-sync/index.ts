@@ -31,7 +31,7 @@ class MailRelayAPI {
     this.apiKey = apiKey;
   }
 
-  private async makeRequest(endpoint: string, method: string = 'GET', data?: any) {
+  private async makeRequest(endpoint: string, method: string = 'GET', data?: any, retries: number = 3) {
     const url = `${this.baseUrl}${endpoint}`;
     const headers = {
       'X-AUTH-TOKEN': this.apiKey,
@@ -41,41 +41,74 @@ class MailRelayAPI {
     const options: RequestInit = {
       method,
       headers,
+      timeout: 30000, // 30 seconds timeout
     };
 
     if (data && (method === 'POST' || method === 'PUT')) {
       options.body = JSON.stringify(data);
     }
 
-    console.log(`Making ${method} request to ${url}`, data);
+    console.log(`Making ${method} request to ${url}`, { data, retries });
 
-    const response = await fetch(url, options);
-    const responseData = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(`MailRelay API error: ${response.status} - ${JSON.stringify(responseData)}`);
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        const response = await fetch(url, options);
+        let responseData;
+        
+        try {
+          responseData = await response.json();
+        } catch (parseError) {
+          responseData = { message: 'Invalid JSON response' };
+        }
+        
+        if (!response.ok) {
+          if (response.status >= 500 && attempt < retries) {
+            console.log(`Server error ${response.status}, retrying... (${attempt}/${retries})`);
+            await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+            continue;
+          }
+          throw new Error(`MailRelay API error: ${response.status} - ${JSON.stringify(responseData)}`);
+        }
+
+        console.log(`MailRelay API success:`, responseData);
+        return responseData;
+        
+      } catch (error) {
+        if (attempt === retries) {
+          console.error(`MailRelay API failed after ${retries} attempts:`, error);
+          throw error;
+        }
+        console.log(`Request failed, retrying... (${attempt}/${retries})`, error.message);
+        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+      }
     }
 
-    return responseData;
+    throw new Error('Max retries exceeded');
   }
 
   async createSubscriber(subscriber: MailRelaySubscriber) {
+    // Primeiro, verificar se o subscriber já existe
+    const existing = await this.getSubscriber(subscriber.email);
+    if (existing) {
+      console.log(`Subscriber ${subscriber.email} already exists, updating instead`);
+      return this.updateSubscriber(subscriber.email, subscriber);
+    }
     return this.makeRequest('/subscribers', 'POST', subscriber);
   }
 
   async updateSubscriber(email: string, subscriber: Partial<MailRelaySubscriber>) {
-    return this.makeRequest(`/subscribers/${email}`, 'PUT', subscriber);
+    return this.makeRequest(`/subscribers/${encodeURIComponent(email)}`, 'PUT', subscriber);
   }
 
   async deleteSubscriber(email: string) {
-    return this.makeRequest(`/subscribers/${email}`, 'DELETE');
+    return this.makeRequest(`/subscribers/${encodeURIComponent(email)}`, 'DELETE');
   }
 
   async getSubscriber(email: string) {
     try {
-      return await this.makeRequest(`/subscribers/${email}`);
+      return await this.makeRequest(`/subscribers/${encodeURIComponent(email)}`);
     } catch (error) {
-      if (error.message.includes('404')) {
+      if (error.message.includes('404') || error.message.includes('not found')) {
         return null;
       }
       throw error;
@@ -83,7 +116,55 @@ class MailRelayAPI {
   }
 
   async addToGroup(email: string, groupId: string) {
-    return this.makeRequest(`/groups/${groupId}/subscribers`, 'POST', { email });
+    try {
+      return await this.makeRequest(`/groups/${groupId}/subscribers`, 'POST', { email });
+    } catch (error) {
+      // Se o grupo não existir, criar ele
+      if (error.message.includes('404') || error.message.includes('not found')) {
+        console.log(`Group ${groupId} not found, creating it first`);
+        await this.createGroup(groupId);
+        return this.makeRequest(`/groups/${groupId}/subscribers`, 'POST', { email });
+      }
+      throw error;
+    }
+  }
+
+  async createGroup(groupId: string) {
+    const groupData = {
+      name: this.getGroupName(groupId),
+      description: this.getGroupDescription(groupId)
+    };
+    
+    try {
+      return await this.makeRequest('/groups', 'POST', groupData);
+    } catch (error) {
+      console.log(`Failed to create group ${groupId}:`, error.message);
+      // Não falhar se o grupo já existir
+      if (error.message.includes('already exists') || error.message.includes('duplicate')) {
+        return { id: groupId, name: groupData.name };
+      }
+      throw error;
+    }
+  }
+
+  private getGroupName(groupId: string): string {
+    const groupNames = {
+      'grupo_newsletter': 'Newsletter Subscribers',
+      'grupo_clientes': 'Clientes Registrados',
+      'grupo_empreendedoras': 'Empreendedoras',
+      'grupo_embaixadoras': 'Embaixadoras'
+    };
+    return groupNames[groupId] || groupId;
+  }
+
+  private getGroupDescription(groupId: string): string {
+    const groupDescriptions = {
+      'grupo_newsletter': 'Usuários inscritos na newsletter',
+      'grupo_clientes': 'Clientes com perfil completo no portal',
+      'grupo_empreendedoras': 'Empreendedoras cadastradas na plataforma',
+      'grupo_embaixadoras': 'Embaixadoras do programa'
+    };
+    return groupDescriptions[groupId] || `Grupo ${groupId}`;
   }
 }
 
