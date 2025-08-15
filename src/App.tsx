@@ -23,6 +23,7 @@ import TransparentCheckoutPage from "./pages/TransparentCheckoutPage";
 import Admin from "./pages/Admin";
 import AdminUsers from "./pages/AdminUsers";
 import AdminBlog from "./pages/AdminBlog";
+import AdminNewsletter from "./pages/AdminNewsletter";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -96,6 +97,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <AdminBlog />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/newsletter" 
+              element={
+                <ProtectedRoute>
+                  <AdminNewsletter />
                 </ProtectedRoute>
               } 
             />

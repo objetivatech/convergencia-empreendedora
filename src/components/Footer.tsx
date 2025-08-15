@@ -69,22 +69,26 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contato */}
+          {/* Newsletter */}
           <div>
-            <h3 className="font-semibold text-lg mb-4">Contato</h3>
-            <div className="space-y-3 text-white/80">
-              <div className="flex items-center space-x-2">
-                <Mail className="h-4 w-4" />
-                <span>contato@mulheresemconvergencia.com</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Phone className="h-4 w-4" />
-                <span>+55 (11) 99999-9999</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <MapPin className="h-4 w-4" />
-                <span>São Paulo, Brasil</span>
-              </div>
+            <h3 className="font-semibold text-lg mb-4">Newsletter</h3>
+            <p className="text-white/80 mb-4">
+              Receba novidades e oportunidades exclusivas!
+            </p>
+            <div className="space-y-2">
+              <input 
+                type="text" 
+                placeholder="Seu nome" 
+                className="w-full px-3 py-2 rounded text-gray-900"
+              />
+              <input 
+                type="email" 
+                placeholder="Seu email" 
+                className="w-full px-3 py-2 rounded text-gray-900"
+              />
+              <button className="w-full bg-white text-primary px-3 py-2 rounded hover:bg-gray-100 transition-colors">
+                Inscrever-se
+              </button>
             </div>
           </div>
         </div>
