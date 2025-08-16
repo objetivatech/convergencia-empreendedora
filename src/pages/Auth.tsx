@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,13 +11,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Eye, EyeOff, Mail, Lock, User, KeyRound } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import Turnstile from "react-turnstile";
+
+const TURNSTILE_SITE_KEY = "0x4AAAAAABaZhkau8iAe2i5DR84rmmRoVQQ";
 
 export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("login");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaKey, setCaptchaKey] = useState(0);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setCaptchaToken(null);
+    setCaptchaKey((k) => k + 1);
+    setError("");
+  }, [activeTab]);
 
   const [loginForm, setLoginForm] = useState({
     email: "",
@@ -43,9 +54,17 @@ export default function Auth() {
     setError("");
 
     try {
+      if (!captchaToken) {
+        setError("Por favor, complete o CAPTCHA.");
+        return;
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email: loginForm.email,
         password: loginForm.password,
+        options: {
+          captchaToken: captchaToken,
+        },
       });
 
       if (error) {
@@ -53,6 +72,8 @@ export default function Auth() {
           setError("Email ou senha incorretos");
         } else if (error.message.includes("Email not confirmed")) {
           setError("Por favor, confirme seu email antes de fazer login");
+        } else if (error.message.includes("captcha")) {
+          setError("Falha na verificação do CAPTCHA. Tente novamente.");
         } else {
           setError(error.message);
         }
@@ -68,6 +89,8 @@ export default function Auth() {
       setError("Erro interno. Tente novamente.");
     } finally {
       setLoading(false);
+      setCaptchaToken(null);
+      setCaptchaKey((k) => k + 1);
     }
   };
 
@@ -89,6 +112,11 @@ export default function Auth() {
     }
 
     try {
+      if (!captchaToken) {
+        setError("Por favor, complete o CAPTCHA.");
+        return;
+      }
+
       const redirectUrl = `${window.location.origin}/dashboard`;
       
       const { data, error } = await supabase.auth.signUp({
@@ -100,13 +128,16 @@ export default function Auth() {
             full_name: signupForm.fullName,
             phone: signupForm.phone,
             newsletter_subscribed: signupForm.newsletterSubscribed
-          }
+          },
+          captchaToken: captchaToken,
         }
       });
 
       if (error) {
         if (error.message.includes("User already registered")) {
           setError("Este email já está cadastrado. Tente fazer login.");
+        } else if (error.message.includes("captcha")) {
+          setError("Falha na verificação do CAPTCHA. Tente novamente.");
         } else {
           setError(error.message);
         }
@@ -124,6 +155,8 @@ export default function Auth() {
       setError("Erro interno. Tente novamente.");
     } finally {
       setLoading(false);
+      setCaptchaToken(null);
+      setCaptchaKey((k) => k + 1);
     }
   };
 
@@ -133,8 +166,14 @@ export default function Auth() {
     setError("");
 
     try {
+      if (!captchaToken) {
+        setError("Por favor, complete o CAPTCHA.");
+        return;
+      }
+
       const { error } = await supabase.auth.resetPasswordForEmail(recoveryForm.email, {
         redirectTo: `${window.location.origin}/auth/reset-password`,
+        captchaToken: captchaToken,
       });
 
       if (error) {
@@ -149,6 +188,8 @@ export default function Auth() {
       setError("Erro interno. Tente novamente.");
     } finally {
       setLoading(false);
+      setCaptchaToken(null);
+      setCaptchaKey((k) => k + 1);
     }
   };
 
@@ -234,7 +275,17 @@ export default function Auth() {
                       </Alert>
                     )}
 
-                    <Button type="submit" className="w-full" disabled={loading}>
+                    <div className="mt-2">
+                      <Turnstile
+                        key={captchaKey}
+                        sitekey={TURNSTILE_SITE_KEY}
+                        onVerify={(token) => setCaptchaToken(token)}
+                        onExpire={() => setCaptchaKey((k) => k + 1)}
+                        theme="auto"
+                      />
+                    </div>
+
+                    <Button type="submit" className="w-full" disabled={loading || !captchaToken}>
                       {loading ? "Entrando..." : "Entrar"}
                     </Button>
                   </form>
@@ -368,7 +419,17 @@ export default function Auth() {
                       </Alert>
                     )}
 
-                    <Button type="submit" className="w-full" disabled={loading}>
+                    <div className="mt-2">
+                      <Turnstile
+                        key={captchaKey}
+                        sitekey={TURNSTILE_SITE_KEY}
+                        onVerify={(token) => setCaptchaToken(token)}
+                        onExpire={() => setCaptchaKey((k) => k + 1)}
+                        theme="auto"
+                      />
+                    </div>
+
+                    <Button type="submit" className="w-full" disabled={loading || !captchaToken}>
                       {loading ? "Criando conta..." : "Criar Conta"}
                     </Button>
                   </form>
@@ -409,7 +470,17 @@ export default function Auth() {
                       </Alert>
                     )}
 
-                    <Button type="submit" className="w-full" disabled={loading}>
+                    <div className="mt-2">
+                      <Turnstile
+                        key={captchaKey}
+                        sitekey={TURNSTILE_SITE_KEY}
+                        onVerify={(token) => setCaptchaToken(token)}
+                        onExpire={() => setCaptchaKey((k) => k + 1)}
+                        theme="auto"
+                      />
+                    </div>
+
+                    <Button type="submit" className="w-full" disabled={loading || !captchaToken}>
                       {loading ? "Enviando..." : "Enviar Email de Recuperação"}
                     </Button>
                   </form>
