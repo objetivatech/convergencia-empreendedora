@@ -8,6 +8,7 @@ import { Calendar, User, Eye, ArrowLeft, Share2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import Layout from "@/components/Layout";
 
 interface BlogPost {
   id: string;
@@ -188,7 +189,8 @@ export default function BlogPost() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <Layout>
+        <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto space-y-6">
           <div className="h-8 bg-muted animate-pulse rounded" />
           <div className="h-64 bg-muted animate-pulse rounded" />
@@ -198,13 +200,15 @@ export default function BlogPost() {
             ))}
           </div>
         </div>
-      </div>
+        </div>
+      </Layout>
     );
   }
 
   if (!post) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <Layout>
+        <div className="container mx-auto px-4 py-8">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Post não encontrado</h1>
           <p className="text-muted-foreground mb-6">
@@ -217,12 +221,14 @@ export default function BlogPost() {
             </Link>
           </Button>
         </div>
-      </div>
+        </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <Layout>
+      <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         {/* Navegação */}
         <div className="mb-6">
@@ -340,6 +346,7 @@ export default function BlogPost() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </Layout>
   );
 }

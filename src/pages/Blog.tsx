@@ -9,6 +9,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import Layout from "@/components/Layout";
 
 interface BlogPost {
   id: string;
@@ -121,7 +122,8 @@ export default function Blog() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <Layout>
+        <div className="container mx-auto px-4 py-8">
         <div className="space-y-6">
           <div className="h-8 bg-muted animate-pulse rounded" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -142,12 +144,14 @@ export default function Blog() {
             ))}
           </div>
         </div>
-      </div>
+        </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <Layout>
+      <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-primary mb-4">Convergindo</h1>
@@ -249,6 +253,7 @@ export default function Blog() {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </Layout>
   );
 }

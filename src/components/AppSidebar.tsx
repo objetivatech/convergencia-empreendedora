@@ -89,7 +89,7 @@ export function AppSidebar() {
   const hasAmbassadorAccess = profile && hasRole('ambassador');
 
   return (
-    <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible="icon">
+    <Sidebar className={`${collapsed ? "w-14" : "w-64"} bg-background border-r`} collapsible="icon">
       <SidebarContent className="py-4">
         {/* Logo */}
         <div className="px-6 mb-6">
