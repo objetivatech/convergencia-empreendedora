@@ -29,6 +29,8 @@ import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import BlogRSS from "./pages/BlogRSS";
 import AdminTest from "./pages/AdminTest";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
@@ -55,6 +57,10 @@ const App = () => (
             <Route path="/pedido-confirmado" element={<OrderConfirmation />} />
             <Route path="/diretorio" element={<Directory />} />
             <Route path="/diretorio/:id" element={<BusinessProfile />} />
+            <Route path="/convergindo" element={<Blog />} />
+            <Route path="/convergindo/:slug" element={<BlogPost />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />

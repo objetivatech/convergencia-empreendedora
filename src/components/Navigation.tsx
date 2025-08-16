@@ -28,6 +28,7 @@ const Navigation = ({ compact = false }: NavigationProps) => {
     { href: "/", label: "Início" },
     { href: "/sobre", label: "Sobre" },
     { href: "/projetos", label: "Projetos" },
+    { href: "/convergindo", label: "Convergindo" },
     { href: "/loja", label: "Loja" },
     { href: "/diretorio", label: "Convergentes" },
     { href: "/dashboard", label: "Meus Dashboards" },

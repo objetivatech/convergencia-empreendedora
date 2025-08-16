@@ -37,6 +37,7 @@ const publicMenuItems = [
   { title: "Início", url: "/", icon: Home },
   { title: "Sobre", url: "/sobre", icon: Info },
   { title: "Projetos", url: "/projetos", icon: FolderOpen },
+  { title: "Convergindo", url: "/convergindo", icon: FileText },
   { title: "Loja", url: "/loja", icon: Store },
   { title: "Convergentes", url: "/diretorio", icon: Users },
 ];
