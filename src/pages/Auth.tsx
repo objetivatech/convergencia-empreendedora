@@ -82,6 +82,24 @@ export default function Auth() {
         return;
       }
 
+      // Verificar token no servidor se disponível
+      if (captchaToken) {
+        try {
+          const { data: verifyResult } = await supabase.functions.invoke('verify-turnstile', {
+            body: { token: captchaToken }
+          });
+          
+          if (!verifyResult?.success) {
+            setError("Falha na verificação de segurança. Tente novamente.");
+            setCaptchaKey((k) => k + 1);
+            return;
+          }
+        } catch (verifyError) {
+          console.warn("Turnstile verification failed:", verifyError);
+          // Continue sem verificação se não for crítico
+        }
+      }
+
       const signInOptions: any = {
         email: loginForm.email,
         password: loginForm.password,
@@ -142,6 +160,24 @@ export default function Auth() {
       if (!captchaToken && !allowWithoutCaptcha) {
         setError("Por favor, complete o CAPTCHA ou aguarde...");
         return;
+      }
+
+      // Verificar token no servidor se disponível
+      if (captchaToken) {
+        try {
+          const { data: verifyResult } = await supabase.functions.invoke('verify-turnstile', {
+            body: { token: captchaToken }
+          });
+          
+          if (!verifyResult?.success) {
+            setError("Falha na verificação de segurança. Tente novamente.");
+            setCaptchaKey((k) => k + 1);
+            return;
+          }
+        } catch (verifyError) {
+          console.warn("Turnstile signup verification failed:", verifyError);
+          // Continue sem verificação se não for crítico
+        }
       }
 
       const redirectUrl = `${window.location.origin}/dashboard`;
