@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string
+          error_message: string | null
+          id: string
+          ip_address: unknown | null
+          new_values: Json | null
+          old_values: Json | null
+          success: boolean
+          target_table: string | null
+          target_user_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          success?: boolean
+          target_table?: string | null
+          target_user_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          success?: boolean
+          target_table?: string | null
+          target_user_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       ambassadors: {
         Row: {
           active: boolean | null
@@ -1233,12 +1278,34 @@ export type Database = {
           website: string
         }[]
       }
+      get_safe_business_reviews: {
+        Args: { p_business_id: string; p_limit?: number; p_offset?: number }
+        Returns: {
+          business_id: string
+          comment: string
+          created_at: string
+          helpful_count: number
+          id: string
+          rating: number
+          reviewer_name: string
+          title: string
+          verified: boolean
+        }[]
+      }
       remove_user_role: {
         Args: {
           old_role: Database["public"]["Enums"]["user_role"]
           user_uuid: string
         }
         Returns: undefined
+      }
+      secure_toggle_admin_status: {
+        Args: { new_admin_status: boolean; target_user_id: string }
+        Returns: boolean
+      }
+      secure_toggle_blog_editor: {
+        Args: { new_editor_status: boolean; target_user_id: string }
+        Returns: boolean
       }
       send_auth_email_via_mailrelay: {
         Args: { email_type: string; recipient_email: string; user_data?: Json }

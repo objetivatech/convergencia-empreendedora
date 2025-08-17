@@ -176,24 +176,16 @@ export const useAdminPermissions = () => {
   };
 
   const toggleAdminStatus = async (userId: string, isAdminFlag: boolean) => {
-    if (!isAdmin() || !user) return;
+    if (!isAdmin() || !user) return false;
 
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ is_admin: isAdminFlag })
-        .eq('id', userId);
-
-      if (error) throw error;
-
-      // Log admin activity (will be implemented later)
-      console.log('Admin activity logged:', {
-        admin_id: user.id,
-         action: isAdminFlag ? 'grant_admin' : 'revoke_admin',
-        target: userId
+      const { data, error } = await supabase.rpc('secure_toggle_admin_status', {
+        target_user_id: userId,
+        new_admin_status: isAdminFlag
       });
 
-      return true;
+      if (error) throw error;
+      return data || false;
     } catch (error) {
       console.error('Error updating admin status:', error);
       return false;
@@ -201,24 +193,16 @@ export const useAdminPermissions = () => {
   };
 
   const toggleBlogEditor = async (userId: string, canEdit: boolean) => {
-    if (!isAdmin() || !user) return;
+    if (!isAdmin() || !user) return false;
 
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ can_edit_blog: canEdit })
-        .eq('id', userId);
-
-      if (error) throw error;
-
-      // Log admin activity (will be implemented later)
-      console.log('Admin activity logged:', {
-        admin_id: user.id,
-        action: canEdit ? 'grant_blog_editor' : 'revoke_blog_editor',
-        target: userId
+      const { data, error } = await supabase.rpc('secure_toggle_blog_editor', {
+        target_user_id: userId,
+        new_editor_status: canEdit
       });
 
-      return true;
+      if (error) throw error;
+      return data || false;
     } catch (error) {
       console.error('Error updating blog editor status:', error);
       return false;
