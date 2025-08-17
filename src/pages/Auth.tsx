@@ -14,8 +14,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Turnstile from "react-turnstile";
 
 // Detectar ambiente e usar chave apropriada
+// ATENÇÃO: Para produção, você precisa configurar a chave real do Turnstile
+// Obtenha sua chave em: https://developers.cloudflare.com/turnstile/
 const isProduction = window.location.hostname !== "localhost" && !window.location.hostname.includes("127.0.0.1");
-const TURNSTILE_SITE_KEY = isProduction ? "1x00000000000000000000AA" : "0x4AAAAAABaZhkau8iAe2i5DR84rmmRoVQQ";
+// Use a chave real do seu domínio mulheresemconvergencia.com.br
+const TURNSTILE_SITE_KEY = isProduction ? "SUA_CHAVE_REAL_AQUI" : "0x4AAAAAABaZhkau8iAe2i5DR84rmmRoVQQ";
 
 export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
