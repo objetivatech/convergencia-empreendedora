@@ -34,12 +34,10 @@ interface UserProfile {
   id: string;
   email: string;
   full_name: string | null;
-  phone: string | null;
   roles: Database["public"]["Enums"]["user_role"][] | null;
   subscription_types: Database["public"]["Enums"]["subscription_type"][] | null;
   is_admin: boolean;
   can_edit_blog: boolean;
-  onboarding_completed: boolean;
   newsletter_subscribed: boolean;
   created_at: string;
 }
@@ -76,10 +74,7 @@ export default function AdminUsers() {
 
   const loadUsers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const { data, error } = await supabase.rpc('get_profiles_admin_safe');
 
       if (error) throw error;
       setUsers(data || []);
@@ -398,14 +393,10 @@ export default function AdminUsers() {
                                       <span className="font-medium">Email:</span>
                                       <p>{selectedUser.email}</p>
                                     </div>
-                                    <div>
-                                      <span className="font-medium">Telefone:</span>
-                                      <p>{selectedUser.phone || 'Não informado'}</p>
-                                    </div>
-                                    <div>
-                                      <span className="font-medium">Cadastro:</span>
-                                      <p>{new Date(selectedUser.created_at).toLocaleDateString('pt-BR')}</p>
-                                    </div>
+                                     <div>
+                                       <span className="font-medium">Cadastro:</span>
+                                       <p>{new Date(selectedUser.created_at).toLocaleDateString('pt-BR')}</p>
+                                     </div>
                                   </div>
                                 </div>
 

@@ -1211,6 +1211,20 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_profiles_admin_safe: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          can_edit_blog: boolean
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          is_admin: boolean
+          newsletter_subscribed: boolean
+          roles: Database["public"]["Enums"]["user_role"][]
+          subscription_types: Database["public"]["Enums"]["subscription_type"][]
+        }[]
+      }
       get_public_business_by_id: {
         Args: { p_business_id: string }
         Returns: {
