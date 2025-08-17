@@ -46,9 +46,9 @@ export default function Auth() {
     const timer = setTimeout(() => {
       if (!turnstileLoaded && !captchaToken) {
         setTurnstileFailed(true);
-        setAllowWithoutCaptcha(true);
+        // Não permitir prosseguir sem CAPTCHA quando o Supabase exige
       }
-    }, 10000); // 10 segundos para timeout
+    }, 10000);
 
     return () => clearTimeout(timer);
   }, [turnstileLoaded, captchaToken, captchaKey]);
@@ -77,8 +77,8 @@ export default function Auth() {
     setError("");
 
     try {
-      if (!captchaToken && !allowWithoutCaptcha) {
-        setError("Por favor, complete o CAPTCHA ou aguarde...");
+      if (!captchaToken) {
+        setError("Por favor, complete o CAPTCHA.");
         return;
       }
 
@@ -157,8 +157,8 @@ export default function Auth() {
     }
 
     try {
-      if (!captchaToken && !allowWithoutCaptcha) {
-        setError("Por favor, complete o CAPTCHA ou aguarde...");
+      if (!captchaToken) {
+        setError("Por favor, complete o CAPTCHA.");
         return;
       }
 
@@ -235,8 +235,8 @@ export default function Auth() {
     setError("");
 
     try {
-      if (!captchaToken && !allowWithoutCaptcha) {
-        setError("Por favor, complete o CAPTCHA ou aguarde...");
+      if (!captchaToken) {
+        setError("Por favor, complete o CAPTCHA.");
         return;
       }
 
@@ -355,7 +355,7 @@ export default function Auth() {
                         <Alert>
                           <AlertTriangle className="h-4 w-4" />
                           <AlertDescription>
-                            O sistema de verificação não carregou. Você pode prosseguir com o login.
+                            O sistema de verificação não carregou. Atualize a página e tente novamente.
                           </AlertDescription>
                         </Alert>
                       ) : (
@@ -368,10 +368,9 @@ export default function Auth() {
                               setTurnstileLoaded(true);
                             }}
                             onExpire={() => setCaptchaKey((k) => k + 1)}
-                            onError={() => {
-                              setTurnstileFailed(true);
-                              setAllowWithoutCaptcha(true);
-                            }}
+                              onError={() => {
+                                setTurnstileFailed(true);
+                              }}
                             theme="auto"
                           />
                           {!turnstileLoaded && !turnstileFailed && (
@@ -383,7 +382,7 @@ export default function Auth() {
                       )}
                     </div>
 
-                    <Button type="submit" className="w-full" disabled={loading || (!captchaToken && !allowWithoutCaptcha)}>
+                    <Button type="submit" className="w-full" disabled={loading || !captchaToken}>
                       {loading ? "Entrando..." : "Entrar"}
                     </Button>
                   </form>
@@ -522,7 +521,7 @@ export default function Auth() {
                         <Alert>
                           <AlertTriangle className="h-4 w-4" />
                           <AlertDescription>
-                            O sistema de verificação não carregou. Você pode prosseguir com o cadastro.
+                            O sistema de verificação não carregou. Atualize a página e tente novamente.
                           </AlertDescription>
                         </Alert>
                       ) : (
@@ -535,10 +534,9 @@ export default function Auth() {
                               setTurnstileLoaded(true);
                             }}
                             onExpire={() => setCaptchaKey((k) => k + 1)}
-                            onError={() => {
-                              setTurnstileFailed(true);
-                              setAllowWithoutCaptcha(true);
-                            }}
+                             onError={() => {
+                               setTurnstileFailed(true);
+                             }}
                             theme="auto"
                           />
                           {!turnstileLoaded && !turnstileFailed && (
@@ -550,7 +548,7 @@ export default function Auth() {
                       )}
                     </div>
 
-                    <Button type="submit" className="w-full" disabled={loading || (!captchaToken && !allowWithoutCaptcha)}>
+                    <Button type="submit" className="w-full" disabled={loading || !captchaToken}>
                       {loading ? "Criando conta..." : "Criar Conta"}
                     </Button>
                   </form>
@@ -596,7 +594,7 @@ export default function Auth() {
                         <Alert>
                           <AlertTriangle className="h-4 w-4" />
                           <AlertDescription>
-                            O sistema de verificação não carregou. Você pode prosseguir com a recuperação.
+                            O sistema de verificação não carregou. Atualize a página e tente novamente.
                           </AlertDescription>
                         </Alert>
                       ) : (
@@ -609,10 +607,9 @@ export default function Auth() {
                               setTurnstileLoaded(true);
                             }}
                             onExpire={() => setCaptchaKey((k) => k + 1)}
-                            onError={() => {
-                              setTurnstileFailed(true);
-                              setAllowWithoutCaptcha(true);
-                            }}
+                             onError={() => {
+                               setTurnstileFailed(true);
+                             }}
                             theme="auto"
                           />
                           {!turnstileLoaded && !turnstileFailed && (
@@ -624,7 +621,7 @@ export default function Auth() {
                       )}
                     </div>
 
-                    <Button type="submit" className="w-full" disabled={loading || (!captchaToken && !allowWithoutCaptcha)}>
+                    <Button type="submit" className="w-full" disabled={loading || !captchaToken}>
                       {loading ? "Enviando..." : "Enviar Email de Recuperação"}
                     </Button>
                   </form>
