@@ -18,7 +18,7 @@ import Turnstile from "react-turnstile";
 // Obtenha sua chave em: https://developers.cloudflare.com/turnstile/
 const isProduction = window.location.hostname !== "localhost" && !window.location.hostname.includes("127.0.0.1");
 // Use a chave real do seu domínio mulheresemconvergencia.com.br
-const TURNSTILE_SITE_KEY = isProduction ? "SUA_CHAVE_REAL_AQUI" : "0x4AAAAAABaZhkau8iAe2i5DR84rmmRoVQQ";
+const TURNSTILE_SITE_KEY = isProduction ? "0x4AAAAAABsq-CKjZDmfk-F7" : "0x4AAAAAABaZhkau8iAe2i5DR84rmmRoVQQ";
 
 export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
