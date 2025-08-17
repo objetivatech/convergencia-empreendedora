@@ -9,11 +9,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Eye, EyeOff, Mail, Lock, User, KeyRound } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, KeyRound, AlertTriangle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import Turnstile from "react-turnstile";
 
-const TURNSTILE_SITE_KEY = "0x4AAAAAABaZhkau8iAe2i5DR84rmmRoVQQ";
+// Detectar ambiente e usar chave apropriada
+const isProduction = window.location.hostname !== "localhost" && !window.location.hostname.includes("127.0.0.1");
+const TURNSTILE_SITE_KEY = isProduction ? "1x00000000000000000000AA" : "0x4AAAAAABaZhkau8iAe2i5DR84rmmRoVQQ";
 
 export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
@@ -22,13 +24,31 @@ export default function Auth() {
   const [activeTab, setActiveTab] = useState("login");
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [captchaKey, setCaptchaKey] = useState(0);
+  const [turnstileLoaded, setTurnstileLoaded] = useState(false);
+  const [turnstileFailed, setTurnstileFailed] = useState(false);
+  const [allowWithoutCaptcha, setAllowWithoutCaptcha] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     setCaptchaToken(null);
     setCaptchaKey((k) => k + 1);
     setError("");
+    setTurnstileLoaded(false);
+    setTurnstileFailed(false);
+    setAllowWithoutCaptcha(false);
   }, [activeTab]);
+
+  // Timeout para detectar falha do Turnstile
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!turnstileLoaded && !captchaToken) {
+        setTurnstileFailed(true);
+        setAllowWithoutCaptcha(true);
+      }
+    }, 10000); // 10 segundos para timeout
+
+    return () => clearTimeout(timer);
+  }, [turnstileLoaded, captchaToken, captchaKey]);
 
   const [loginForm, setLoginForm] = useState({
     email: "",
@@ -54,18 +74,22 @@ export default function Auth() {
     setError("");
 
     try {
-      if (!captchaToken) {
-        setError("Por favor, complete o CAPTCHA.");
+      if (!captchaToken && !allowWithoutCaptcha) {
+        setError("Por favor, complete o CAPTCHA ou aguarde...");
         return;
       }
 
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const signInOptions: any = {
         email: loginForm.email,
         password: loginForm.password,
-        options: {
-          captchaToken: captchaToken,
-        },
-      });
+      };
+
+      // Só incluir captchaToken se estiver disponível
+      if (captchaToken) {
+        signInOptions.options = { captchaToken: captchaToken };
+      }
+
+      const { data, error } = await supabase.auth.signInWithPassword(signInOptions);
 
       if (error) {
         if (error.message.includes("Invalid login credentials")) {
@@ -112,14 +136,14 @@ export default function Auth() {
     }
 
     try {
-      if (!captchaToken) {
-        setError("Por favor, complete o CAPTCHA.");
+      if (!captchaToken && !allowWithoutCaptcha) {
+        setError("Por favor, complete o CAPTCHA ou aguarde...");
         return;
       }
 
       const redirectUrl = `${window.location.origin}/dashboard`;
       
-      const { data, error } = await supabase.auth.signUp({
+      const signUpOptions: any = {
         email: signupForm.email,
         password: signupForm.password,
         options: {
@@ -128,10 +152,16 @@ export default function Auth() {
             full_name: signupForm.fullName,
             phone: signupForm.phone,
             newsletter_subscribed: signupForm.newsletterSubscribed
-          },
-          captchaToken: captchaToken,
+          }
         }
-      });
+      };
+
+      // Só incluir captchaToken se estiver disponível
+      if (captchaToken) {
+        signUpOptions.options.captchaToken = captchaToken;
+      }
+      
+      const { data, error } = await supabase.auth.signUp(signUpOptions);
 
       if (error) {
         if (error.message.includes("User already registered")) {
@@ -166,15 +196,21 @@ export default function Auth() {
     setError("");
 
     try {
-      if (!captchaToken) {
-        setError("Por favor, complete o CAPTCHA.");
+      if (!captchaToken && !allowWithoutCaptcha) {
+        setError("Por favor, complete o CAPTCHA ou aguarde...");
         return;
       }
 
-      const { error } = await supabase.auth.resetPasswordForEmail(recoveryForm.email, {
+      const resetOptions: any = {
         redirectTo: `${window.location.origin}/auth/reset-password`,
-        captchaToken: captchaToken,
-      });
+      };
+
+      // Só incluir captchaToken se estiver disponível
+      if (captchaToken) {
+        resetOptions.captchaToken = captchaToken;
+      }
+
+      const { error } = await supabase.auth.resetPasswordForEmail(recoveryForm.email, resetOptions);
 
       if (error) {
         setError(error.message);
@@ -276,16 +312,39 @@ export default function Auth() {
                     )}
 
                     <div className="mt-2">
-                      <Turnstile
-                        key={captchaKey}
-                        sitekey={TURNSTILE_SITE_KEY}
-                        onVerify={(token) => setCaptchaToken(token)}
-                        onExpire={() => setCaptchaKey((k) => k + 1)}
-                        theme="auto"
-                      />
+                      {turnstileFailed ? (
+                        <Alert>
+                          <AlertTriangle className="h-4 w-4" />
+                          <AlertDescription>
+                            O sistema de verificação não carregou. Você pode prosseguir com o login.
+                          </AlertDescription>
+                        </Alert>
+                      ) : (
+                        <>
+                          <Turnstile
+                            key={captchaKey}
+                            sitekey={TURNSTILE_SITE_KEY}
+                            onVerify={(token) => {
+                              setCaptchaToken(token);
+                              setTurnstileLoaded(true);
+                            }}
+                            onExpire={() => setCaptchaKey((k) => k + 1)}
+                            onError={() => {
+                              setTurnstileFailed(true);
+                              setAllowWithoutCaptcha(true);
+                            }}
+                            theme="auto"
+                          />
+                          {!turnstileLoaded && !turnstileFailed && (
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Carregando verificação de segurança...
+                            </p>
+                          )}
+                        </>
+                      )}
                     </div>
 
-                    <Button type="submit" className="w-full" disabled={loading || !captchaToken}>
+                    <Button type="submit" className="w-full" disabled={loading || (!captchaToken && !allowWithoutCaptcha)}>
                       {loading ? "Entrando..." : "Entrar"}
                     </Button>
                   </form>
@@ -420,16 +479,39 @@ export default function Auth() {
                     )}
 
                     <div className="mt-2">
-                      <Turnstile
-                        key={captchaKey}
-                        sitekey={TURNSTILE_SITE_KEY}
-                        onVerify={(token) => setCaptchaToken(token)}
-                        onExpire={() => setCaptchaKey((k) => k + 1)}
-                        theme="auto"
-                      />
+                      {turnstileFailed ? (
+                        <Alert>
+                          <AlertTriangle className="h-4 w-4" />
+                          <AlertDescription>
+                            O sistema de verificação não carregou. Você pode prosseguir com o cadastro.
+                          </AlertDescription>
+                        </Alert>
+                      ) : (
+                        <>
+                          <Turnstile
+                            key={captchaKey}
+                            sitekey={TURNSTILE_SITE_KEY}
+                            onVerify={(token) => {
+                              setCaptchaToken(token);
+                              setTurnstileLoaded(true);
+                            }}
+                            onExpire={() => setCaptchaKey((k) => k + 1)}
+                            onError={() => {
+                              setTurnstileFailed(true);
+                              setAllowWithoutCaptcha(true);
+                            }}
+                            theme="auto"
+                          />
+                          {!turnstileLoaded && !turnstileFailed && (
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Carregando verificação de segurança...
+                            </p>
+                          )}
+                        </>
+                      )}
                     </div>
 
-                    <Button type="submit" className="w-full" disabled={loading || !captchaToken}>
+                    <Button type="submit" className="w-full" disabled={loading || (!captchaToken && !allowWithoutCaptcha)}>
                       {loading ? "Criando conta..." : "Criar Conta"}
                     </Button>
                   </form>
@@ -471,16 +553,39 @@ export default function Auth() {
                     )}
 
                     <div className="mt-2">
-                      <Turnstile
-                        key={captchaKey}
-                        sitekey={TURNSTILE_SITE_KEY}
-                        onVerify={(token) => setCaptchaToken(token)}
-                        onExpire={() => setCaptchaKey((k) => k + 1)}
-                        theme="auto"
-                      />
+                      {turnstileFailed ? (
+                        <Alert>
+                          <AlertTriangle className="h-4 w-4" />
+                          <AlertDescription>
+                            O sistema de verificação não carregou. Você pode prosseguir com a recuperação.
+                          </AlertDescription>
+                        </Alert>
+                      ) : (
+                        <>
+                          <Turnstile
+                            key={captchaKey}
+                            sitekey={TURNSTILE_SITE_KEY}
+                            onVerify={(token) => {
+                              setCaptchaToken(token);
+                              setTurnstileLoaded(true);
+                            }}
+                            onExpire={() => setCaptchaKey((k) => k + 1)}
+                            onError={() => {
+                              setTurnstileFailed(true);
+                              setAllowWithoutCaptcha(true);
+                            }}
+                            theme="auto"
+                          />
+                          {!turnstileLoaded && !turnstileFailed && (
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Carregando verificação de segurança...
+                            </p>
+                          )}
+                        </>
+                      )}
                     </div>
 
-                    <Button type="submit" className="w-full" disabled={loading || !captchaToken}>
+                    <Button type="submit" className="w-full" disabled={loading || (!captchaToken && !allowWithoutCaptcha)}>
                       {loading ? "Enviando..." : "Enviar Email de Recuperação"}
                     </Button>
                   </form>
