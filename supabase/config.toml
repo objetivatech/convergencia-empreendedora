@@ -62,3 +62,6 @@ verify_jwt = false
 
 [functions.test-mailrelay]
 verify_jwt = false
+
+[functions.mailrelay-force-sync]
+verify_jwt = false

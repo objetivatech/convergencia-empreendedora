@@ -26,44 +26,25 @@ export const ProtectedRoute = ({
   useEffect(() => {
     if (authLoading || profileLoading) return;
 
-    console.log('ProtectedRoute Debug:', {
-      user: user?.email,
-      profile: profile?.email,
-      adminOnly,
-      isAdmin: isAdmin(),
-      profileIsAdmin: profile?.is_admin,
-      requiredRole,
-      hasRequiredRole: requiredRole ? hasRole(requiredRole) : true,
-      profileRoles: profile?.roles
-    });
-
     // Check if user is authenticated
     if (!user) {
-      console.log('ProtectedRoute: No user, redirecting to', redirectTo);
       navigate(redirectTo);
       return;
     }
 
-    // Check admin requirement with improved logic
-    if (adminOnly) {
-      const userIsAdmin = isAdmin() || profile?.is_admin || false;
-      console.log('ProtectedRoute: Admin check:', { userIsAdmin, adminOnly });
-      
-      if (!userIsAdmin) {
-        console.log('ProtectedRoute: User is not admin, showing access denied');
-        navigate("/dashboard", { 
-          state: { 
-            accessDenied: true, 
-            message: "Acesso negado. Você não tem permissões de administrador." 
-          } 
-        });
-        return;
-      }
+    // Check admin requirement - SIMPLIFIED LOGIC
+    if (adminOnly && !profile?.is_admin) {
+      navigate("/dashboard", { 
+        state: { 
+          accessDenied: true, 
+          message: "Acesso negado. Você não tem permissões de administrador." 
+        } 
+      });
+      return;
     }
 
     // Check role requirement
     if (requiredRole && !hasRole(requiredRole)) {
-      console.log('ProtectedRoute: User does not have required role:', requiredRole);
       navigate("/dashboard", { 
         state: { 
           accessDenied: true, 
@@ -75,7 +56,6 @@ export const ProtectedRoute = ({
 
     // Check subscription requirement
     if (requiredSubscription && !hasSubscription(requiredSubscription)) {
-      console.log('ProtectedRoute: User does not have required subscription:', requiredSubscription);
       navigate("/dashboard", { 
         state: { 
           accessDenied: true, 
@@ -84,22 +64,7 @@ export const ProtectedRoute = ({
       });
       return;
     }
-
-    console.log('ProtectedRoute: All checks passed, allowing access');
-  }, [
-    user, 
-    profile, 
-    authLoading, 
-    profileLoading, 
-    requiredRole, 
-    requiredSubscription, 
-    adminOnly, 
-    redirectTo, 
-    navigate, 
-    hasRole, 
-    hasSubscription, 
-    isAdmin
-  ]);
+  }, [user, profile, authLoading, profileLoading, requiredRole, requiredSubscription, adminOnly, redirectTo, navigate, hasRole, hasSubscription]);
 
   if (authLoading || profileLoading) {
     return (
@@ -116,11 +81,8 @@ export const ProtectedRoute = ({
     return null;
   }
 
-  if (adminOnly) {
-    const userIsAdmin = isAdmin() || profile?.is_admin || false;
-    if (!userIsAdmin) {
-      return null;
-    }
+  if (adminOnly && !profile?.is_admin) {
+    return null;
   }
 
   if (requiredRole && !hasRole(requiredRole)) {
