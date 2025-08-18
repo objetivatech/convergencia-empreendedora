@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRoles } from "@/hooks/useUserRoles";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -12,11 +13,15 @@ import { toast } from "sonner";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const { profile, hasRole, addRole, loading: profileLoading } = useUserRoles();
   const { hasPendingSubscription, pendingSubscription, syncWithAsaas } = useSubscription();
   const [loading, setLoading] = useState(false);
   const [syncLoading, setSyncLoading] = useState(false);
+
+  // Check for access denied message
+  const accessDeniedMessage = location.state?.accessDenied ? location.state?.message : null;
 
   const becomeAmbassador = async () => {
     if (!user || !profile) return;
@@ -77,6 +82,16 @@ export default function Dashboard() {
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
+        {/* Access Denied Alert */}
+        {accessDeniedMessage && (
+          <Alert className="mb-6 border-destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription className="text-destructive">
+              {accessDeniedMessage}
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-primary">Meus Dashboards</h1>
           <p className="text-muted-foreground mt-2">
