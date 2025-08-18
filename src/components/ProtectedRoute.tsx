@@ -50,8 +50,13 @@ export const ProtectedRoute = ({
       console.log('ProtectedRoute: Admin check:', { userIsAdmin, adminOnly });
       
       if (!userIsAdmin) {
-        console.log('ProtectedRoute: User is not admin, redirecting to dashboard');
-        navigate("/dashboard");
+        console.log('ProtectedRoute: User is not admin, showing access denied');
+        navigate("/dashboard", { 
+          state: { 
+            accessDenied: true, 
+            message: "Acesso negado. Você não tem permissões de administrador." 
+          } 
+        });
         return;
       }
     }
@@ -59,14 +64,24 @@ export const ProtectedRoute = ({
     // Check role requirement
     if (requiredRole && !hasRole(requiredRole)) {
       console.log('ProtectedRoute: User does not have required role:', requiredRole);
-      navigate("/dashboard");
+      navigate("/dashboard", { 
+        state: { 
+          accessDenied: true, 
+          message: `Acesso negado. Você precisa da role: ${requiredRole}` 
+        } 
+      });
       return;
     }
 
     // Check subscription requirement
     if (requiredSubscription && !hasSubscription(requiredSubscription)) {
       console.log('ProtectedRoute: User does not have required subscription:', requiredSubscription);
-      navigate("/dashboard");
+      navigate("/dashboard", { 
+        state: { 
+          accessDenied: true, 
+          message: `Acesso negado. Você precisa da assinatura: ${requiredSubscription}` 
+        } 
+      });
       return;
     }
 
