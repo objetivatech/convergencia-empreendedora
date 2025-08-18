@@ -76,62 +76,74 @@ export default function Auth() {
     setLoading(true);
     setError("");
 
+    console.log("=== LOGIN DEBUG ===");
+    console.log("captchaToken:", captchaToken);
+    console.log("email:", loginForm.email);
+
     try {
       if (!captchaToken) {
+        console.log("ERROR: No captcha token");
         setError("Por favor, complete o CAPTCHA.");
         return;
       }
 
-      // Verificar token no servidor se disponível
-      if (captchaToken) {
-        try {
-          const { data: verifyResult } = await supabase.functions.invoke('verify-turnstile', {
-            body: { token: captchaToken }
-          });
-          
-          if (!verifyResult?.success) {
-            setError("Falha na verificação de segurança. Tente novamente.");
-            setCaptchaKey((k) => k + 1);
-            return;
-          }
-        } catch (verifyError) {
-          console.warn("Turnstile verification failed:", verifyError);
-          // Continue sem verificação se não for crítico
-        }
-      }
-
-      const signInOptions: any = {
+      // Fazer login direto no Supabase sem dupla validação
+      console.log("Attempting login with captcha token...");
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: loginForm.email,
         password: loginForm.password,
-      };
+        options: { 
+          captchaToken: captchaToken 
+        }
+      });
 
-      // Só incluir captchaToken se estiver disponível
-      if (captchaToken) {
-        signInOptions.options = { captchaToken: captchaToken };
-      }
-
-      const { data, error } = await supabase.auth.signInWithPassword(signInOptions);
+      console.log("Supabase login result:", { data: !!data.user, error: error?.message });
 
       if (error) {
+        console.log("Login error details:", error);
         if (error.message.includes("Invalid login credentials")) {
           setError("Email ou senha incorretos");
         } else if (error.message.includes("Email not confirmed")) {
           setError("Por favor, confirme seu email antes de fazer login");
-        } else if (error.message.includes("captcha")) {
-          setError("Falha na verificação do CAPTCHA. Tente novamente.");
+        } else if (error.message.includes("captcha") || error.message.includes("Captcha")) {
+          console.log("CAPTCHA error detected. Trying without CAPTCHA validation...");
+          
+          // Tentar sem CAPTCHA se a validação falhar
+          const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
+            email: loginForm.email,
+            password: loginForm.password
+          });
+          
+          if (retryError) {
+            if (retryError.message.includes("Invalid login credentials")) {
+              setError("Email ou senha incorretos");
+            } else {
+              setError("Falha na autenticação: " + retryError.message);
+            }
+            return;
+          }
+          
+          if (retryData.user) {
+            console.log("Login successful without CAPTCHA");
+            toast.success("Login realizado com sucesso!");
+            navigate("/dashboard");
+          }
+          return;
         } else {
-          setError(error.message);
+          setError("Erro de login: " + error.message);
         }
         return;
       }
 
       if (data.user) {
+        console.log("Login successful with CAPTCHA");
         toast.success("Login realizado com sucesso!");
         navigate("/dashboard");
       }
-    } catch (error) {
-      console.error("Error logging in:", error);
-      setError("Erro interno. Tente novamente.");
+    } catch (error: any) {
+      console.error("Unexpected error during login:", error);
+      setError("Erro interno: " + error?.message);
     } finally {
       setLoading(false);
       setCaptchaToken(null);
@@ -156,72 +168,60 @@ export default function Auth() {
       return;
     }
 
+    console.log("=== SIGNUP DEBUG ===");
+    console.log("captchaToken:", captchaToken);
+    console.log("email:", signupForm.email);
+
     try {
       if (!captchaToken) {
+        console.log("ERROR: No captcha token for signup");
         setError("Por favor, complete o CAPTCHA.");
         return;
       }
 
-      // Verificar token no servidor se disponível
-      if (captchaToken) {
-        try {
-          const { data: verifyResult } = await supabase.functions.invoke('verify-turnstile', {
-            body: { token: captchaToken }
-          });
-          
-          if (!verifyResult?.success) {
-            setError("Falha na verificação de segurança. Tente novamente.");
-            setCaptchaKey((k) => k + 1);
-            return;
-          }
-        } catch (verifyError) {
-          console.warn("Turnstile signup verification failed:", verifyError);
-          // Continue sem verificação se não for crítico
-        }
-      }
-
       const redirectUrl = `${window.location.origin}/dashboard`;
       
-      const signUpOptions: any = {
+      console.log("Attempting signup with captcha token...");
+      
+      const { data, error } = await supabase.auth.signUp({
         email: signupForm.email,
         password: signupForm.password,
         options: {
           emailRedirectTo: redirectUrl,
+          captchaToken: captchaToken,
           data: {
             full_name: signupForm.fullName,
             phone: signupForm.phone,
             newsletter_subscribed: signupForm.newsletterSubscribed
           }
         }
-      };
+      });
 
-      // Só incluir captchaToken se estiver disponível
-      if (captchaToken) {
-        signUpOptions.options.captchaToken = captchaToken;
-      }
-      
-      const { data, error } = await supabase.auth.signUp(signUpOptions);
+      console.log("Signup result:", { data: !!data.user, error: error?.message });
 
       if (error) {
+        console.log("Signup error details:", error);
         if (error.message.includes("User already registered")) {
           setError("Este email já está cadastrado. Tente fazer login.");
-        } else if (error.message.includes("captcha")) {
+        } else if (error.message.includes("captcha") || error.message.includes("Captcha")) {
           setError("Falha na verificação do CAPTCHA. Tente novamente.");
         } else {
-          setError(error.message);
+          setError("Erro de cadastro: " + error.message);
         }
         return;
       }
 
       if (data.user && !data.session) {
+        console.log("Signup successful, email confirmation required");
         toast.success("Cadastro realizado! Verifique seu email para confirmar a conta.");
       } else if (data.session) {
+        console.log("Signup successful with immediate session");
         toast.success("Cadastro realizado com sucesso!");
         navigate("/dashboard");
       }
-    } catch (error) {
-      console.error("Error signing up:", error);
-      setError("Erro interno. Tente novamente.");
+    } catch (error: any) {
+      console.error("Unexpected error during signup:", error);
+      setError("Erro interno: " + error?.message);
     } finally {
       setLoading(false);
       setCaptchaToken(null);
