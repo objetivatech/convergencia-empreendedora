@@ -1178,6 +1178,16 @@ export type Database = {
         }
         Returns: string
       }
+      get_admin_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          active_subscriptions: number
+          new_users_this_month: number
+          total_businesses: number
+          total_subscriptions: number
+          total_users: number
+        }[]
+      }
       get_ambassador_by_referral: {
         Args: { referral_code: string }
         Returns: {

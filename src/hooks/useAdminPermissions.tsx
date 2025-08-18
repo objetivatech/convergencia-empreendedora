@@ -39,36 +39,25 @@ export const useAdminPermissions = () => {
 
   const loadAdminStats = async () => {
     try {
-      const [usersResult, businessesResult, subscriptionsResult] = await Promise.all([
-        supabase.from('profiles').select('id, created_at'),
-        supabase.from('businesses').select('id, created_at'),
-        supabase.from('user_subscriptions').select('id, status, created_at')
-      ]);
-
-      const totalUsers = usersResult.data?.length || 0;
-      const totalBusinesses = businessesResult.data?.length || 0;
-      const totalSubscriptions = subscriptionsResult.data?.length || 0;
+      // Use the new secure admin stats function instead of direct table access
+      const { data, error } = await supabase.rpc('get_admin_stats');
       
-      // Calculate new users this month
-      const currentMonth = new Date();
-      currentMonth.setDate(1);
-      const newUsersThisMonth = usersResult.data?.filter(user => 
-        new Date(user.created_at) >= currentMonth
-      ).length || 0;
+      if (error) {
+        console.error('Error loading admin stats:', error);
+        return;
+      }
 
-      // Calculate active subscriptions
-      const activeSubscriptions = subscriptionsResult.data?.filter(sub => 
-        sub.status === 'active'
-      ).length || 0;
-
-      setStats({
-        totalUsers,
-        totalBusinesses,
-        totalSubscriptions,
-        totalRevenue: 0, // Will be calculated from actual payments
-        newUsersThisMonth,
-        activeSubscriptions
-      });
+      if (data && data.length > 0) {
+        const statsData = data[0];
+        setStats({
+          totalUsers: statsData.total_users || 0,
+          totalBusinesses: statsData.total_businesses || 0,
+          totalSubscriptions: statsData.total_subscriptions || 0,
+          totalRevenue: 0, // Will be calculated from actual payments
+          newUsersThisMonth: statsData.new_users_this_month || 0,
+          activeSubscriptions: statsData.active_subscriptions || 0
+        });
+      }
     } catch (error) {
       console.error('Error loading admin stats:', error);
     } finally {
