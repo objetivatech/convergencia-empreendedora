@@ -241,7 +241,7 @@ export default function Auth() {
       }
 
       const resetOptions: any = {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${window.location.origin}/auth/reset-password`,
       };
 
       // Só incluir captchaToken se estiver disponível
