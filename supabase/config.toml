@@ -1,13 +1,1 @@
 project_id = "ngqymbjatenxztrjjdxa"
-
-[functions.create-asaas-payment]
-verify_jwt = false
-
-[functions.sync-google-reviews]
-verify_jwt = false
-
-[functions.track-referral-click]
-verify_jwt = false
-
-[functions.verify-turnstile]
-verify_jwt = false
