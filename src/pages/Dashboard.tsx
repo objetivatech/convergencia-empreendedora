@@ -150,7 +150,7 @@ export default function Dashboard() {
               <CardContent>
                 <Button 
                   className="w-full"
-                  onClick={() => navigate("/dashboard-negocio")}
+                  onClick={() => navigate("/business-dashboard")}
                 >
                   Acessar Dashboard
                 </Button>
@@ -201,32 +201,55 @@ export default function Dashboard() {
               <CardContent>
                 <Button 
                   className="w-full"
-                  onClick={() => navigate("/dashboard-embaixadora")}
+                  onClick={() => navigate("/ambassador-dashboard")}
                 >
                   Acessar Dashboard
                 </Button>
               </CardContent>
             </Card>
-          ) : (
+          ) : null}
+
+          {/* Customer Dashboard */}
+          {(hasRole('customer') || !profile?.roles || profile.roles.length === 0) && (
             <Card className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-muted-foreground" />
-                  Dashboard Embaixadora
+                  <ShoppingCart className="h-5 w-5 text-primary" />
+                  Dashboard Cliente
                 </CardTitle>
                 <CardDescription>
-                  Torne-se embaixadora e ganhe comissões
+                  Gerencie suas compras e perfil
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Button 
-                  className="w-full" 
-                  variant="outline"
-                  onClick={becomeAmbassador}
-                  disabled={loading}
+                  className="w-full"
+                  onClick={() => navigate("/customer-dashboard")}
                 >
-                  <Crown className="h-4 w-4 mr-2" />
-                  {loading ? "Processando..." : "Tornar-se Embaixadora"}
+                  Acessar Dashboard
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Community Dashboard */}
+          {hasRole('community_member') && (
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-primary" />
+                  Dashboard Comunidade
+                </CardTitle>
+                <CardDescription>
+                  Conecte-se com outros membros
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  className="w-full"
+                  onClick={() => navigate("/community-dashboard")}
+                >
+                  Acessar Dashboard
                 </Button>
               </CardContent>
             </Card>

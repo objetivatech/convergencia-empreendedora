@@ -20,20 +20,34 @@ export default function ResetPassword() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Verificar se há tokens de recuperação válidos
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
-    
-    if (!accessToken || !refreshToken) {
-      setError("Link de recuperação inválido ou expirado.");
-      return;
-    }
+    const initializeSession = async () => {
+      // Verificar se há tokens de recuperação válidos
+      const accessToken = searchParams.get('access_token');
+      const refreshToken = searchParams.get('refresh_token');
+      
+      if (!accessToken || !refreshToken) {
+        setError("Link de recuperação inválido ou expirado.");
+        return;
+      }
 
-    // Definir a sessão com os tokens recebidos
-    supabase.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken
-    });
+      try {
+        // Definir a sessão com os tokens recebidos
+        const { error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        });
+
+        if (error) {
+          console.error("Erro ao definir sessão:", error);
+          // Não mostrar erro aqui, permitir que o usuário tente mesmo assim
+        }
+      } catch (error) {
+        console.error("Erro ao processar tokens:", error);
+        // Não mostrar erro aqui, permitir que o usuário tente mesmo assim
+      }
+    };
+
+    initializeSession();
   }, [searchParams]);
 
   const handlePasswordReset = async (e: React.FormEvent) => {
