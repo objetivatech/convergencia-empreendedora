@@ -19,7 +19,8 @@ import {
   UserCog,
   Store,
   Crown,
-  BarChart3
+  BarChart3,
+  Mail
 } from "lucide-react";
 
 export default function Admin() {
@@ -59,11 +60,11 @@ export default function Admin() {
       color: "bg-blue-500"
     },
     {
-      title: "Editor de Blog",
-      description: "Criar e publicar posts",
-      icon: FileText,
-      href: "/admin/blog",
-      color: "bg-green-500"
+      title: "MailRelay",
+      description: "Sincronização e newsletter",
+      icon: Mail,
+      href: "/admin/mailrelay",
+      color: "bg-blue-500"
     },
     {
       title: "Negócios",

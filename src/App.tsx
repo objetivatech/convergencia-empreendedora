@@ -22,6 +22,7 @@ import PlanSelection from "./pages/PlanSelection";
 import TransparentCheckoutPage from "./pages/TransparentCheckoutPage";
 import Admin from "./pages/Admin";
 import AdminUsers from "./pages/AdminUsers";
+import AdminMailRelay from "./pages/AdminMailRelay";
 import AdminBlog from "./pages/AdminBlog";
 import AdminNewsletter from "./pages/AdminNewsletter";
 import Profile from "./pages/Profile";
@@ -113,7 +114,15 @@ const App = () => (
               } 
             />
             <Route 
-              path="/admin/blog" 
+              path="/admin/mailrelay" 
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <AdminMailRelay />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/blog"
               element={
                 <ProtectedRoute adminOnly={true}>
                   <AdminBlog />
