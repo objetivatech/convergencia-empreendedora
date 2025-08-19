@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   NavigationMenu,
@@ -13,24 +12,17 @@ import {
 } from "@/components/ui/navigation-menu";
 import { 
   Menu, 
-  ShoppingCart, 
   User, 
   LogOut, 
   Home,
   Info,
-  FolderOpen,
   BookOpen,
-  Store,
-  Users,
   LayoutDashboard,
   UserCog,
   Edit,
-  Mail,
-  Building2,
-  Crown
+  Mail
 } from "lucide-react";
 import NotificationCenter from "./NotificationCenter";
-import { useCartStore } from "@/hooks/useCartStore";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRoles } from "@/hooks/useUserRoles";
 import { cn } from "@/lib/utils";
@@ -38,10 +30,8 @@ import { cn } from "@/lib/utils";
 const MainNavigation = () => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
-  const { getTotalItems } = useCartStore();
   const { user, signOut } = useAuth();
-  const { hasRole, isAdmin, canEditBlog } = useUserRoles();
-  const totalItems = getTotalItems();
+  const { isAdmin, canEditBlog } = useUserRoles();
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -51,48 +41,30 @@ const MainNavigation = () => {
   const mainMenuItems = [
     { href: "/", label: "Início", icon: Home },
     { href: "/sobre", label: "Sobre", icon: Info },
-    { href: "/projetos", label: "Projetos", icon: FolderOpen },
     { href: "/convergindo", label: "Convergindo", icon: BookOpen },
-    { href: "/loja", label: "Loja", icon: Store },
-    { href: "/diretorio", label: "Convergentes", icon: Users },
   ];
 
   // Menu "Minha Conta" (apenas para usuários logados)
   const accountMenuItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/perfil", label: "Meu Perfil", icon: User },
-    { href: "/cart", label: "Carrinho", icon: ShoppingCart, badge: totalItems },
   ];
 
   // Menu "Administração" (apenas para admins)
   const adminMenuItems = [
     { href: "/admin", label: "Painel Admin", icon: UserCog },
-    { href: "/admin/usuarios", label: "Gerenciar Usuários", icon: Users },
     { href: "/admin/blog", label: "Editor de Blog", icon: Edit },
     { href: "/admin/newsletter", label: "Newsletter", icon: Mail },
-  ];
-
-  // Menu "Negócio" (apenas para business_owner)
-  const businessMenuItems = [
-    { href: "/dashboard-negocio", label: "Dashboard Negócio", icon: Building2 },
-  ];
-
-  // Menu "Embaixadora" (apenas para ambassadors)
-  const ambassadorMenuItems = [
-    { href: "/dashboard-embaixadora", label: "Dashboard Embaixadora", icon: Crown },
   ];
 
   const ListItem = ({ 
     href, 
     children, 
-    icon: Icon, 
-    badge,
+    icon: Icon,
     onClick 
   }: { 
     href: string; 
     children: React.ReactNode; 
-    icon?: any; 
-    badge?: number;
+    icon?: any;
     onClick?: () => void;
   }) => (
     <li>
@@ -107,11 +79,6 @@ const MainNavigation = () => {
         >
           {Icon && <Icon className="h-4 w-4" />}
           <div className="text-sm font-medium leading-none">{children}</div>
-          {badge && badge > 0 && (
-            <Badge variant="destructive" className="h-5 w-5 p-0 text-xs">
-              {badge}
-            </Badge>
-          )}
         </Link>
       </NavigationMenuLink>
     </li>
@@ -162,7 +129,6 @@ const MainNavigation = () => {
                           key={item.href} 
                           href={item.href} 
                           icon={item.icon}
-                          badge={item.badge}
                         >
                           {item.label}
                         </ListItem>
@@ -191,64 +157,11 @@ const MainNavigation = () => {
                   </NavigationMenuContent>
                 </NavigationMenuItem>
               )}
-
-              {/* Menu Negócio (apenas para business_owner) */}
-              {hasRole("business_owner") && (
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger>Negócio</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-64 gap-3 p-4">
-                      {businessMenuItems.map((item) => (
-                        <ListItem 
-                          key={item.href} 
-                          href={item.href} 
-                          icon={item.icon}
-                        >
-                          {item.label}
-                        </ListItem>
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              )}
-
-              {/* Menu Embaixadora (apenas para ambassadors) */}
-              {hasRole("ambassador") && (
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger>Embaixadora</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-64 gap-3 p-4">
-                      {ambassadorMenuItems.map((item) => (
-                        <ListItem 
-                          key={item.href} 
-                          href={item.href} 
-                          icon={item.icon}
-                        >
-                          {item.label}
-                        </ListItem>
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              )}
             </NavigationMenuList>
           </NavigationMenu>
 
           {/* Actions */}
           <div className="flex items-center space-x-2 md:space-x-4">
-            {/* Cart (visible on desktop) */}
-            <Link to="/cart" className="relative hidden md:block">
-              <Button variant="outline" size="sm" className="gap-2">
-                <ShoppingCart className="h-4 w-4" />
-                <span>Carrinho</span>
-                {totalItems > 0 && (
-                  <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 p-0 text-xs">
-                    {totalItems}
-                  </Badge>
-                )}
-              </Button>
-            </Link>
-
             <NotificationCenter />
 
             {user ? (
@@ -326,11 +239,6 @@ const MainNavigation = () => {
                             >
                               <Icon className="h-4 w-4" />
                               {item.label}
-                              {item.badge && item.badge > 0 && (
-                                <Badge variant="destructive" className="h-5 w-5 p-0 text-xs ml-auto">
-                                  {item.badge}
-                                </Badge>
-                              )}
                             </Link>
                           );
                         })}
@@ -344,62 +252,6 @@ const MainNavigation = () => {
                       <h3 className="font-semibold text-sm text-muted-foreground mb-3">Administração</h3>
                       <div className="space-y-2">
                         {adminMenuItems.map((item) => {
-                          const Icon = item.icon;
-                          return (
-                            <Link
-                              key={item.href}
-                              to={item.href}
-                              onClick={() => setIsOpen(false)}
-                              className={cn(
-                                "flex items-center gap-3 text-sm font-medium transition-colors hover:text-primary px-3 py-2 rounded-md",
-                                isActive(item.href)
-                                  ? "text-primary bg-primary/10"
-                                  : "text-muted-foreground"
-                              )}
-                            >
-                              <Icon className="h-4 w-4" />
-                              {item.label}
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Menu Negócio Mobile */}
-                  {hasRole("business_owner") && (
-                    <div>
-                      <h3 className="font-semibold text-sm text-muted-foreground mb-3">Negócio</h3>
-                      <div className="space-y-2">
-                        {businessMenuItems.map((item) => {
-                          const Icon = item.icon;
-                          return (
-                            <Link
-                              key={item.href}
-                              to={item.href}
-                              onClick={() => setIsOpen(false)}
-                              className={cn(
-                                "flex items-center gap-3 text-sm font-medium transition-colors hover:text-primary px-3 py-2 rounded-md",
-                                isActive(item.href)
-                                  ? "text-primary bg-primary/10"
-                                  : "text-muted-foreground"
-                              )}
-                            >
-                              <Icon className="h-4 w-4" />
-                              {item.label}
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Menu Embaixadora Mobile */}
-                  {hasRole("ambassador") && (
-                    <div>
-                      <h3 className="font-semibold text-sm text-muted-foreground mb-3">Embaixadora</h3>
-                      <div className="space-y-2">
-                        {ambassadorMenuItems.map((item) => {
                           const Icon = item.icon;
                           return (
                             <Link

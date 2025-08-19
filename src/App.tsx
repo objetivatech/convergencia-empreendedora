@@ -8,28 +8,16 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import About from "./pages/About";
-import Projects from "./pages/Projects";
-import Shop from "./pages/Shop";
-import Cart from "./pages/Cart";
-import Checkout from "./pages/Checkout";
-import OrderConfirmation from "./pages/OrderConfirmation";
-import Directory from "./pages/Directory";
-import BusinessProfile from "./pages/BusinessProfile";
-import BusinessDashboard from "./pages/BusinessDashboard";
-import AmbassadorDashboard from "./pages/AmbassadorDashboard";
 import Dashboard from "./pages/Dashboard";
-import PlanSelection from "./pages/PlanSelection";
-import TransparentCheckoutPage from "./pages/TransparentCheckoutPage";
 import Admin from "./pages/Admin";
 import AdminUsers from "./pages/AdminUsers";
 import AdminMailRelay from "./pages/AdminMailRelay";
 import AdminBlog from "./pages/AdminBlog";
 import AdminNewsletter from "./pages/AdminNewsletter";
-import Profile from "./pages/Profile";
+import AdminTest from "./pages/AdminTest";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import BlogRSS from "./pages/BlogRSS";
-import AdminTest from "./pages/AdminTest";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import ScrollToTop from "./components/ScrollToTop";
@@ -51,13 +39,6 @@ const App = () => (
             <Route path="/rss" element={<BlogRSS />} />
             <Route path="/feed.xml" element={<BlogRSS />} />
             <Route path="/sobre" element={<About />} />
-            <Route path="/projetos" element={<Projects />} />
-            <Route path="/loja" element={<Shop />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/pedido-confirmado" element={<OrderConfirmation />} />
-            <Route path="/diretorio" element={<Directory />} />
-            <Route path="/diretorio/:id" element={<BusinessProfile />} />
             <Route path="/convergindo" element={<Blog />} />
             <Route path="/convergindo/:slug" element={<BlogPost />} />
             <Route path="/blog" element={<Blog />} />
@@ -67,34 +48,9 @@ const App = () => (
                 <Dashboard />
               </ProtectedRoute>
             } />
-            <Route path="/perfil" element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } />
-            <Route path="/planos" element={
-              <ProtectedRoute>
-                <PlanSelection />
-              </ProtectedRoute>
-            } />
-            <Route path="/checkout/transparente/:planId" element={
-              <ProtectedRoute>
-                <TransparentCheckoutPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard-negocio" element={
-              <ProtectedRoute requiredRole="business_owner">
-                <BusinessDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard-embaixadora" element={
-              <ProtectedRoute requiredRole="ambassador">
-                <AmbassadorDashboard />
-              </ProtectedRoute>
-            } />
+            
             {/* Legacy routes */}
             <Route path="/about" element={<About />} />
-            <Route path="/projects" element={<Projects />} />
             
             {/* Admin Routes */}
             <Route 

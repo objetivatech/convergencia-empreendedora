@@ -1,73 +1,15 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRoles } from "@/hooks/useUserRoles";
-import { useSubscription } from "@/hooks/useSubscription";
-import { supabase } from "@/integrations/supabase/client";
-import { Building2, Users, ShoppingCart, TrendingUp, Crown, Plus, AlertTriangle } from "lucide-react";
-import { toast } from "sonner";
+import { BookOpen, UserCog } from "lucide-react";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { user } = useAuth();
-  const { profile, hasRole, addRole, loading: profileLoading } = useUserRoles();
-  const { hasPendingSubscription, pendingSubscription, syncWithAsaas } = useSubscription();
-  const [loading, setLoading] = useState(false);
-  const [syncLoading, setSyncLoading] = useState(false);
-
-  // Check for access denied message
-  const accessDeniedMessage = location.state?.accessDenied ? location.state?.message : null;
-
-  const becomeAmbassador = async () => {
-    if (!user || !profile) return;
-    
-    setLoading(true);
-    try {
-      await addRole('ambassador');
-      toast.success("Você agora é uma embaixadora! Acesse seu dashboard.");
-    } catch (error) {
-      console.error("Error becoming ambassador:", error);
-      toast.error("Erro ao se tornar embaixadora. Tente novamente.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const becomeBusinessOwner = async () => {
-    if (!user || !profile) return;
-    
-    setLoading(true);
-    try {
-      await addRole('business_owner');
-      toast.success("Agora você pode gerenciar negócios! Acesse seu dashboard.");
-    } catch (error) {
-      console.error("Error becoming business owner:", error);
-      toast.error("Erro ao se tornar dono de negócio. Tente novamente.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSyncSubscriptions = async () => {
-    setSyncLoading(true);
-    try {
-      const result = await syncWithAsaas();
-      if (result.success) {
-        toast.success(`Sincronização concluída: ${result.deleted || 0} assinaturas inválidas removidas`);
-      } else {
-        toast.error(`Erro na sincronização: ${result.error}`);
-      }
-    } catch (error) {
-      toast.error("Erro ao sincronizar com ASAAS");
-    } finally {
-      setSyncLoading(false);
-    }
-  };
+  const { profile, isAdmin, canEditBlog, loading: profileLoading } = useUserRoles();
 
   if (profileLoading) {
     return (
@@ -82,199 +24,57 @@ export default function Dashboard() {
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
-        {/* Access Denied Alert */}
-        {accessDeniedMessage && (
-          <Alert className="mb-6 border-destructive">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription className="text-destructive">
-              {accessDeniedMessage}
-            </AlertDescription>
-          </Alert>
-        )}
-
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-primary">Meus Dashboards</h1>
+          <h1 className="text-3xl font-bold text-primary">Dashboard</h1>
           <p className="text-muted-foreground mt-2">
-            Bem-vinda, {profile?.full_name || user?.email}! Escolha o dashboard que deseja acessar.
+            Bem-vinda, {profile?.full_name || user?.email}!
           </p>
         </div>
 
-        {/* Pending Subscription Alert */}
-        {hasPendingSubscription && (
-          <Card className="mb-6 border-orange-200 bg-orange-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-orange-700">
-                <AlertTriangle className="h-5 w-5" />
-                Assinatura Pendente
-              </CardTitle>
-              <CardDescription className="text-orange-600">
-                Você tem uma assinatura do plano "{pendingSubscription?.subscription_plans?.display_name}" aguardando pagamento.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-orange-600 mb-4">
-                Complete o pagamento para acessar o dashboard do negócio e todas as funcionalidades do plano.
-              </p>
-              <Button 
-                variant="outline" 
-                className="border-orange-300 text-orange-700 hover:bg-orange-100 mr-2"
-                onClick={() => toast.info("Verifique seu email para o link de pagamento ou entre em contato com o suporte.")}
-              >
-                Como completar o pagamento?
-              </Button>
-              <Button 
-                variant="outline" 
-                className="border-orange-300 text-orange-700 hover:bg-orange-100"
-                onClick={handleSyncSubscriptions}
-                disabled={syncLoading}
-              >
-                {syncLoading ? "Sincronizando..." : "Verificar Status no ASAAS"}
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Business Dashboard */}
-          {hasRole('business_owner') ? (
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Building2 className="h-5 w-5 text-primary" />
-                  Dashboard Negócio
-                </CardTitle>
-                <CardDescription>
-                  Gerencie seu negócio no diretório
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button 
-                  className="w-full"
-                  onClick={() => navigate("/business-dashboard")}
-                >
-                  Acessar Dashboard
-                </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Building2 className="h-5 w-5 text-muted-foreground" />
-                  Dashboard Negócio
-                </CardTitle>
-                <CardDescription>
-                  Cadastre seu negócio e apareça no diretório
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button 
-                  className="w-full" 
-                  variant="outline"
-                  onClick={() => navigate("/planos")}
-                  disabled={loading || hasPendingSubscription}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  {hasPendingSubscription ? "Pagamento Pendente" : "Cadastrar Negócio"}
-                </Button>
-                {hasPendingSubscription && (
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Complete o pagamento da assinatura pendente antes de criar uma nova.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Ambassador Dashboard */}
-          {hasRole('ambassador') ? (
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-primary" />
-                  Dashboard Embaixadora
-                </CardTitle>
-                <CardDescription>
-                  Acompanhe suas vendas e comissões
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button 
-                  className="w-full"
-                  onClick={() => navigate("/ambassador-dashboard")}
-                >
-                  Acessar Dashboard
-                </Button>
-              </CardContent>
-            </Card>
-          ) : null}
-
-          {/* Customer Dashboard */}
-          {(hasRole('customer') || !profile?.roles || profile.roles.length === 0) && (
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ShoppingCart className="h-5 w-5 text-primary" />
-                  Dashboard Cliente
-                </CardTitle>
-                <CardDescription>
-                  Gerencie suas compras e perfil
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button 
-                  className="w-full"
-                  onClick={() => navigate("/customer-dashboard")}
-                >
-                  Acessar Dashboard
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Community Dashboard */}
-          {hasRole('community_member') && (
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-primary" />
-                  Dashboard Comunidade
-                </CardTitle>
-                <CardDescription>
-                  Conecte-se com outros membros
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button 
-                  className="w-full"
-                  onClick={() => navigate("/community-dashboard")}
-                >
-                  Acessar Dashboard
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Shop/Orders */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Blog */}
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <ShoppingCart className="h-5 w-5 text-primary" />
-                Minhas Compras
+                <BookOpen className="h-5 w-5 text-primary" />
+                Blog Convergindo
               </CardTitle>
               <CardDescription>
-                Histórico de pedidos e compras
+                Acompanhe nossas publicações
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button 
                 className="w-full"
-                onClick={() => navigate("/loja")}
+                onClick={() => navigate("/convergindo")}
               >
-                Ver Compras
+                Ver Blog
               </Button>
             </CardContent>
           </Card>
+
+          {/* Admin Dashboard */}
+          {(isAdmin() || canEditBlog()) && (
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <UserCog className="h-5 w-5 text-primary" />
+                  Painel Administrativo
+                </CardTitle>
+                <CardDescription>
+                  Gerenciar conteúdo e usuários
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  className="w-full"
+                  onClick={() => navigate("/admin")}
+                >
+                  Acessar Admin
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         <div className="mt-12">
@@ -282,32 +82,20 @@ export default function Dashboard() {
             <CardHeader>
               <CardTitle>Seu Perfil</CardTitle>
               <CardDescription>
-                Informações da sua conta e permissões ativas
+                Informações da sua conta
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-semibold mb-2">Informações Pessoais</h3>
-                  <div className="space-y-1 text-sm">
-                    <p><strong>Nome:</strong> {profile?.full_name || "Não informado"}</p>
-                    <p><strong>Email:</strong> {user?.email}</p>
-                    <p><strong>Telefone:</strong> {profile?.phone || "Não informado"}</p>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-2">Permissões Ativas</h3>
-                  <div className="space-y-1 text-sm">
-                    {profile?.roles?.map((role) => (
-                      <span key={role} className="inline-block bg-primary/10 text-primary px-2 py-1 rounded mr-2 mb-1">
-                        {role === 'customer' ? 'Cliente' : 
-                         role === 'business_owner' ? 'Dono de Negócio' :
-                         role === 'ambassador' ? 'Embaixadora' :
-                         role === 'admin' ? 'Administrador' : role}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+              <div className="space-y-2">
+                <p><strong>Nome:</strong> {profile?.full_name || "Não informado"}</p>
+                <p><strong>Email:</strong> {user?.email}</p>
+                <p><strong>Telefone:</strong> {profile?.phone || "Não informado"}</p>
+                {profile?.is_admin && (
+                  <p><strong>Permissão:</strong> Administrador</p>
+                )}
+                {profile?.can_edit_blog && (
+                  <p><strong>Permissão:</strong> Editor do Blog</p>
+                )}
               </div>
             </CardContent>
           </Card>
