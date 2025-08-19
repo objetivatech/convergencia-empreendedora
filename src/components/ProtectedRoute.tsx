@@ -1,7 +1,8 @@
+// src/components/ProtectedRoute.tsx
+import { useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRoles } from "@/hooks/useUserRoles";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 import { Database } from "@/integrations/supabase/types";
 
 interface ProtectedRouteProps {
@@ -9,89 +10,78 @@ interface ProtectedRouteProps {
   requiredRole?: Database["public"]["Enums"]["user_role"];
   requiredSubscription?: Database["public"]["Enums"]["subscription_type"];
   adminOnly?: boolean;
-  redirectTo?: string;
+  redirectTo?: string; // default: "/"
 }
 
-export const ProtectedRoute = ({ 
-  children, 
-  requiredRole, 
+/**
+ * Corrige loops de redirecionamento:
+ * - Aguarda loading de auth e de profile.
+ * - Faz apenas UM navigate() (com replace) quando necessário.
+ * - Evita retornar "null" enquanto ainda carrega (mostra placeholder).
+ */
+export const ProtectedRoute = ({
+  children,
+  requiredRole,
   requiredSubscription,
   adminOnly = false,
-  redirectTo = "/auth" 
+  redirectTo = "/",
 }: ProtectedRouteProps) => {
-  const { user, loading: authLoading } = useAuth();
-  const { profile, loading: profileLoading, hasRole, hasSubscription, isAdmin } = useUserRoles();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user, loading: authLoading } = useAuth();
+  const {
+    profile,
+    loading: profileLoading,
+    hasRole,
+    hasSubscription,
+  } = useUserRoles();
+
+  // evita multiplos navigates durante re-render
+  const navigatedRef = useRef(false);
+
+  const isLoading = authLoading || profileLoading;
+
+  const notLogged = !isLoading && !user;
+  const notAdmin = !isLoading && adminOnly && !profile?.is_admin;
+  const lacksRole = !isLoading && requiredRole && !hasRole(requiredRole);
+  const lacksSub = !isLoading && requiredSubscription && !hasSubscription(requiredSubscription);
 
   useEffect(() => {
-    if (authLoading || profileLoading) return;
+    if (isLoading || navigatedRef.current) return;
 
-    // Check if user is authenticated
-    if (!user) {
-      navigate(redirectTo);
+    // Decide o destino 1 vez só
+    if (notLogged) {
+      navigatedRef.current = true;
+      navigate(redirectTo, { replace: true, state: { from: location.pathname } });
       return;
     }
 
-    // Check admin requirement - SIMPLIFIED LOGIC
-    if (adminOnly && !profile?.is_admin) {
-      navigate("/dashboard", { 
-        state: { 
-          accessDenied: true, 
-          message: "Acesso negado. Você não tem permissões de administrador." 
-        } 
-      });
-      return;
+    if (notAdmin || lacksRole || lacksSub) {
+      navigatedRef.current = true;
+      navigate(redirectTo, { replace: true, state: { from: location.pathname } });
     }
+  }, [
+    isLoading,
+    notLogged,
+    notAdmin,
+    lacksRole,
+    lacksSub,
+    navigate,
+    redirectTo,
+    location.pathname,
+  ]);
 
-    // Check role requirement
-    if (requiredRole && !hasRole(requiredRole)) {
-      navigate("/dashboard", { 
-        state: { 
-          accessDenied: true, 
-          message: `Acesso negado. Você precisa da role: ${requiredRole}` 
-        } 
-      });
-      return;
-    }
-
-    // Check subscription requirement
-    if (requiredSubscription && !hasSubscription(requiredSubscription)) {
-      navigate("/dashboard", { 
-        state: { 
-          accessDenied: true, 
-          message: `Acesso negado. Você precisa da assinatura: ${requiredSubscription}` 
-        } 
-      });
-      return;
-    }
-  }, [user, profile, authLoading, profileLoading, requiredRole, requiredSubscription, adminOnly, redirectTo, navigate, hasRole, hasSubscription]);
-
-  if (authLoading || profileLoading) {
+  // Enquanto carrega, não renderiza nada sensível e NÃO navega
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-          <p className="text-muted-foreground">Carregando...</p>
-        </div>
+      <div className="w-full flex items-center justify-center py-10 text-muted-foreground">
+        Carregando permissões…
       </div>
     );
   }
 
-  if (!user) {
-    return null;
-  }
-
-  if (adminOnly && !profile?.is_admin) {
-    return null;
-  }
-
-  if (requiredRole && !hasRole(requiredRole)) {
-    return null;
-  }
-
-  if (requiredSubscription && !hasSubscription(requiredSubscription)) {
-    return null;
-  }
-
+  // Se chegou até aqui, está autorizado
   return <>{children}</>;
 };
+
+export default ProtectedRoute;
