@@ -1,8 +1,9 @@
 // src/components/ProtectedRoute.tsx
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRoles } from "@/hooks/useUserRoles";
+import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/integrations/supabase/types";
 
 interface ProtectedRouteProps {
@@ -38,11 +39,47 @@ export const ProtectedRoute = ({
 
   // evita multiplos navigates durante re-render
   const navigatedRef = useRef(false);
+  
+  // Fallback direto quando useUserRoles falha
+  const [fallbackAdmin, setFallbackAdmin] = useState<boolean | null>(null);
+  const [fallbackLoading, setFallbackLoading] = useState(false);
 
-  const isLoading = authLoading || profileLoading;
+  // Se profile é null mas user existe, tentar consulta direta
+  useEffect(() => {
+    if (user && !profile && !profileLoading && adminOnly && fallbackAdmin === null && !fallbackLoading) {
+      console.log('🔄 Fallback: Trying direct admin check for:', user.email);
+      setFallbackLoading(true);
+      
+      const fetchAdminStatus = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', user.id)
+            .single();
+            
+          console.log('🔄 Fallback query result:', { data, error });
+          if (data) {
+            setFallbackAdmin(data.is_admin);
+            console.log('✅ Fallback admin status:', data.is_admin);
+          }
+        } catch (error) {
+          console.error('❌ Fallback query error:', error);
+        } finally {
+          setFallbackLoading(false);
+        }
+      };
+      
+      fetchAdminStatus();
+    }
+  }, [user, profile, profileLoading, adminOnly, fallbackAdmin, fallbackLoading]);
+
+  const isLoading = authLoading || profileLoading || fallbackLoading;
 
   const notLogged = !isLoading && !user;
-  const notAdmin = !isLoading && adminOnly && !profile?.is_admin;
+  // Use fallback admin status if profile is null
+  const actualAdminStatus = profile?.is_admin ?? fallbackAdmin ?? false;
+  const notAdmin = !isLoading && adminOnly && !actualAdminStatus;
   const lacksRole = !isLoading && requiredRole && !hasRole(requiredRole);
   const lacksSub = !isLoading && requiredSubscription && !hasSubscription(requiredSubscription);
 
@@ -51,9 +88,12 @@ export const ProtectedRoute = ({
     path: location.pathname,
     authLoading,
     profileLoading,
+    fallbackLoading,
     isLoading,
     user: user?.email,
     profile: profile ? { email: profile.email, isAdmin: profile.is_admin, canEditBlog: profile.can_edit_blog } : null,
+    fallbackAdmin,
+    actualAdminStatus,
     adminOnly,
     notLogged,
     notAdmin,

@@ -21,6 +21,7 @@ export const useUserRoles = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('👤 useUserRoles effect triggered:', { user: user?.email, hasUser: !!user });
     if (user) {
       loadUserProfile();
     } else {
@@ -30,7 +31,13 @@ export const useUserRoles = () => {
   }, [user]);
 
   const loadUserProfile = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('🚫 loadUserProfile: No user found');
+      return;
+    }
+
+    console.log('🔍 loadUserProfile: Starting for user:', user.email);
+    setLoading(true);
 
     try {
       const { data, error } = await supabase
@@ -39,16 +46,36 @@ export const useUserRoles = () => {
         .eq('id', user.id)
         .single();
 
+      console.log('📊 Profile query result:', { data, error, userId: user.id });
+
       if (error) {
-        console.error('Error loading user profile:', error);
+        console.error('❌ Error loading user profile:', error);
+        // Try without .single() in case of data issues
+        const { data: dataArray, error: errorArray } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id);
+        
+        console.log('🔄 Fallback query result:', { dataArray, errorArray });
+        
+        if (dataArray && dataArray.length > 0) {
+          setProfile(dataArray[0]);
+          console.log('✅ Profile loaded via fallback:', dataArray[0]);
+        }
         return;
       }
 
-      setProfile(data);
+      if (data) {
+        setProfile(data);
+        console.log('✅ Profile loaded successfully:', { email: data.email, isAdmin: data.is_admin });
+      } else {
+        console.log('⚠️ No profile data returned');
+      }
     } catch (error) {
-      console.error('Error in loadUserProfile:', error);
+      console.error('💥 Exception in loadUserProfile:', error);
     } finally {
       setLoading(false);
+      console.log('🏁 loadUserProfile completed');
     }
   };
 
