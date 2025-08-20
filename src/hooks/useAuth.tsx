@@ -37,15 +37,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
+        console.log('🔐 Auth state changed:', { event, user: session?.user?.email, session: !!session });
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
 
-        // Handle additional profile setup on sign up
-        if (event === 'SIGNED_IN' && session?.user && !user) {
-          setTimeout(async () => {
-            await createUserProfile(session.user);
+        // Handle additional profile setup on sign up - defer with setTimeout to avoid deadlock
+        if (event === 'SIGNED_IN' && session?.user) {
+          setTimeout(() => {
+            createUserProfile(session.user);
           }, 100);
         }
       }

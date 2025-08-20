@@ -46,6 +46,21 @@ export const ProtectedRoute = ({
   const lacksRole = !isLoading && requiredRole && !hasRole(requiredRole);
   const lacksSub = !isLoading && requiredSubscription && !hasSubscription(requiredSubscription);
 
+  // Debug logs temporários
+  console.log('🛡️ ProtectedRoute debug:', {
+    path: location.pathname,
+    authLoading,
+    profileLoading,
+    isLoading,
+    user: user?.email,
+    profile: profile ? { email: profile.email, isAdmin: profile.is_admin, canEditBlog: profile.can_edit_blog } : null,
+    adminOnly,
+    notLogged,
+    notAdmin,
+    lacksRole,
+    lacksSub
+  });
+
   useEffect(() => {
     if (isLoading || navigatedRef.current) return;
 
